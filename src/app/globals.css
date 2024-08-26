@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Freckle+Face&family=Pirata+One&display=swap');
+
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+
+
+body {
+  font-family: "DM Sans", sans-serif;
+  font-style: normal;
+}
+
+.logo{
+  font-family: "Pirata One", system-ui;
+  font-weight: 700;
+  font-style: normal;
+}
+
+

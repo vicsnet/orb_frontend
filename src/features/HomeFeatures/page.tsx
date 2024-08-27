@@ -8,7 +8,7 @@ import Footer from '@/components/Footer'
 export default function HomeFeatures() {
   return (
     <main className=''>
-        <Navbar/>
+        <Navbar title="Orb Space"/>
         <HeroSection />
         <CreatorsContent />
         <KnowMore/>

@@ -1,7 +1,6 @@
 "use client";
 import Image from 'next/image'
 import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/router'
 import React from 'react'
 
 export default function Footer() {
@@ -12,7 +11,7 @@ export default function Footer() {
   console.log(pathname);
   
   return (
-    <section className='relative'>
+    <section className='relative bottom-0'>
       
       {/* background image */}
       <div className="" style={{ position: 'relative', width: '100%', height: '589px' }}>

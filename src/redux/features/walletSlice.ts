@@ -2,11 +2,13 @@ import { StarknetWindowObject } from "@argent/get-starknet";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type InitialState={
-starknetAccount:StarknetWindowObject | null
+starknetAccount:StarknetWindowObject | null,
+error:string | null
 }
 
 const initialState ={
-    starknetAccount:null
+    starknetAccount:null,
+    error:null
 } as InitialState;
 
 export const wallet = createSlice({
@@ -16,11 +18,13 @@ export const wallet = createSlice({
         walletConnect(state, action: PayloadAction<StarknetWindowObject>){
             return{
                 starknetAccount: action.payload,
+                error: null
             }
         },
         walletDisConnect(){
             return{
-                starknetAccount:null
+                starknetAccount:null,
+                error:null
             }
         }
     }

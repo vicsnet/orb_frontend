@@ -1,7 +1,10 @@
+import { useAppSelector } from '@/redux/store'
 import Image from 'next/image'
 import React from 'react'
 
 export default function AboutOrb() {
+    const orbDetail = useAppSelector((state)=> state.OrbDetailsReducer.OrbAccountDetails)
+    const contract = useAppSelector((state)=> state.OrbDetailsReducer.address);
   return (
     <section className='w-[90%] mx-auto'>
         <div className="w-[40%]">
@@ -19,8 +22,8 @@ export default function AboutOrb() {
                 <p className="">..................................................................................</p>
 
                 <div className="flex items-center">
-                    <p className="text-[14px] font-bold tracking-[0.46px] underline">Vincent</p>
-                    <Image src='/images/Group.svg' alt={"Vincent"} width={16} height={16}/>
+                    <p className="text-[14px] font-bold tracking-[0.46px] underline">{orbDetail?.name}</p>
+                    <Image src='/images/Group.svg' alt={orbDetail?.name !== undefined ? orbDetail.name : 'orb creator'} width={16} height={16}/>
                 </div>
             </div>
             <div className="flex items-center gap-4">
@@ -28,8 +31,8 @@ export default function AboutOrb() {
                 <p className="">.................................................................................</p>
 
                 <div className="flex items-center">
-                    <p className="text-[14px] font-bold tracking-[0.46px] underline">0x8d6..jh7</p>
-                    <Image src='/images/Group.svg' alt={"Vincent"} width={16} height={16}/>
+                    <p className="text-[14px] font-bold tracking-[0.46px] underline">{`${contract?.slice(0,5)}..${contract?.slice(-3)}`}</p>
+                    <Image src='/images/Group.svg' alt={orbDetail?.name !== undefined ? orbDetail.name : 'orb creator'} width={16} height={16}/>
                 </div>
             </div>
             <div className="flex items-center gap-4">

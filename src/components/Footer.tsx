@@ -1,4 +1,5 @@
 "use client";
+import { useAppSelector } from '@/redux/store';
 import Image from 'next/image'
 import { usePathname } from 'next/navigation';
 import React from 'react'
@@ -6,6 +7,7 @@ import React from 'react'
 export default function Footer() {
   // const router = useRouter();
   const pathname = usePathname()
+  const contract = useAppSelector((state)=>state.OrbDetailsReducer.address)
   // const current_path = router.pathname;
 
   console.log(pathname);
@@ -48,8 +50,10 @@ export default function Footer() {
         <div className="flex justify-center mt-[40px]">
         <button className='flex gap-2 items-center'> 
         <p className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#99E515]">
+<a href={`https://sepolia.voyager.online/contract/${contract}`}>
 
-        Verified on Starkscan
+        Verified on voyager
+</a>
         </p>
         <Image src="/images/External_link.svg"  alt='Join Our Community' width={24} height={24}/>
         </button>

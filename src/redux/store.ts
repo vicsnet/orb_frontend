@@ -1,10 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useSelector } from "react-redux";
 import walletReducer from "./features/walletSlice";
+import OrbDetailsReducer  from "./features/orbSlice";
+import orbTermsReducer from "./features/termsSlice";
+import PriceDataReducer from './features/priceSlice';
 
 export const store = configureStore({
     reducer:{
         walletReducer,
+        OrbDetailsReducer,
+        orbTermsReducer,
+        PriceDataReducer
     }
 })
 

@@ -1,7 +1,86 @@
+"use client";
+import { ProviderUrl } from "@/constant/contract";
+import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Contract, RpcProvider, shortString } from "starknet";
+import { currentDate, epochToTime } from "@/constant/constant";
+import { LuDot } from "react-icons/lu";
+import { useDispatch } from "react-redux";
+import { getOrbPrice } from "@/redux/features/priceSlice";
 
-export default function OrbHero() {
+type OrbHeroProps = {
+  setOpenPurchase: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenInvoke: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps) {
+  const description = useAppSelector(
+    (state) => state.OrbDetailsReducer.OrbAccountDetails?.description
+  );
+  const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
+
+  const starknetAccount = useAppSelector(
+    (state) => state.walletReducer.starknetAccount
+  );
+  const dispatch = useDispatch();
+  const [price, setPrice] = useState<any>(0);
+  const [orbStatus, setOrbStatus] = useState<boolean>(false);
+  const [totalFracOrb, setTotalFracOrb] = useState<any>(0);
+  const [AddressFrac, setAddressFrac] = useState<any>(0);
+  const [orbEndDate, setOrbEndDate] = useState("");
+  const [orbToken, setOrbToken] = useState<any>(0);
+  const decimal: number = 1000000000000000000;
+
+  const fetchData = async () => {
+    try {
+      const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+
+      if (contract !== null) {
+        const { abi: testAbi } = await provider.getClassAt(contract);
+
+        if (testAbi === undefined) {
+          throw new Error("no abi.");
+        }
+
+        const myContractCall = new Contract(testAbi, contract, provider);
+
+        const priceHash = await myContractCall.get_orb_price();
+
+        setPrice(priceHash.toString());
+        dispatch(getOrbPrice({ price: priceHash.toString() }));
+
+        const orbStatus = await myContractCall.get_orb_status();
+        setOrbStatus(orbStatus);
+
+        const orbEndTime = await myContractCall.get_honored_until();
+        const epochTimeConversion = epochToTime(orbEndTime.toString());
+        setOrbEndDate(epochTimeConversion);
+
+        const totalOrb = await myContractCall.get_total_supply();
+        setTotalFracOrb(totalOrb.toString());
+        const totalAddressFrac = await myContractCall.my_fractioned_balance(
+          contract
+        );
+        setAddressFrac(totalAddressFrac.toString());
+        if (starknetAccount) {
+          const buyerAddress = starknetAccount?.account.address;
+          const myFracBalance = await myContractCall.my_fractioned_balance(
+            buyerAddress
+          );
+          setOrbToken(myFracBalance);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    console.log('orbToken', orbToken);
+    
+  }, [orbToken]);
   return (
     <section className="w-[90%] mx-auto mt-[180px] relative">
       <div
@@ -15,7 +94,9 @@ export default function OrbHero() {
         <div className="">
           {/* status */}
           <h2 className="text-[20px] font-bold leading-[26px] tracking-[0.15px] capitalize text-white text-center pt-[16px]">
-            ORB IS LIVE
+            {orbStatus && orbEndDate > currentDate() && "ORB IS LIVE"}
+            {orbStatus && orbEndDate < currentDate() && "ORB HAS ENDED"}
+            {!orbStatus && "ORB NOT STARTED"}
           </h2>
 
           {/* PRICE */}
@@ -31,36 +112,74 @@ export default function OrbHero() {
               Orb Price
             </h2>
             <p className="text-white font-bold leading-[32.016px] text-center">
-              200 Strk
+              {price / decimal} Strk
             </p>
           </div>
 
           <div className=" w-[90%] mx-auto flex justify-center flex-col">
             <p className="font-bold text-[20px] leading-[26px] tracking-[0.15px] text-center">
-              Owning Vincent’s Orb allows its Keeper to ask Nic a question
-              every 7 days. You can purchase a fraction of the orb to be a
-              keeper and gain the right to book and ask Vincent questions.
+              {orbStatus && orbEndDate > currentDate() && description}
+              {orbStatus &&
+                orbEndDate < currentDate() &&
+                "And now his watch has ended. Orb is over, and no further activity will happen. Thank you to everyone who participated."}
             </p>
           </div>
-
-          <div className="flex justify-center">
-            <button className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8">
-              Purchase a fraction
-            </button>
-
+          {/* for non orb user */}
+          <div className="w-[90%] mx-auto mt-5">
+            <div className="bg-[#636669BF] rounded-full flex w-[35%] ">
+              <p className="font-bold text-white text-[16px] leading-5  py-[4px] text-center px-[20px]">
+                {AddressFrac}/{totalFracOrb} available
+              </p>
+            </div>
           </div>
-            {/* if purchased */}
-            {/* <div className="flex gap-1 text-center justify-center mt-12 mb-8 ">
-            <h2 className="text-[14px] font-bold leading-[26px] tracking-[0.46px] underline text-[#99E515]">Follow Vincent</h2>
-            <Image src='/images/External_link.svg' alt='follow_Vincent' width={16} height={16} />
+          {/* for user */}
+          <div className="flex items-center w-[90%] mx-auto mt-5">
+            <LuDot size={40} className="text-[#99E515]" />
+            <p className="text-[16px] font-bold leading-5 text-[#FFFFFF] -ml-2">
+              Active
+            </p>
+          </div>
+          {orbToken === 0 && (
+            <div className="flex justify-center">
+              {orbStatus && (
+                <button
+                  className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                  onClick={() => setOpenPurchase(true)}
+                >
+                  Purchase a fraction
+                </button>
+              )}
+            </div>
+          )}
 
-            </div> */}
+          {orbToken >= 1 && (
+            <>
+              {/* if purchased */}
 
-            {/* if purchased */}
-            {/* <div className="flex justify-center gap-4 mt-12 mb-8">
-              <button className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#121312] bg-[#99E515] rounded-md px-[16px] py-[8px]"> Ask Question</button>
-              <button className="border-[#99E515] border-[1px] rounded-md text-[#99E515] px-[16px] py-[8px] text-[14px] leading-[26px] tracking-[0.46px] ">Book Meeting</button>
-            </div> */}
+              <div className="flex gap-1 text-center justify-center mt-12 mb-8 ">
+                <h2 className="text-[14px] font-bold leading-[26px] tracking-[0.46px] underline text-[#99E515]">
+                  Follow Vincent
+                </h2>
+                <Image
+                  src="/images/External_link.svg"
+                  alt="follow_Vincent"
+                  width={16}
+                  height={16}
+                />
+              </div>
+
+              {/* if purchased */}
+              <div className="flex justify-center gap-4 mt-12 mb-8">
+                <button className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#121312] bg-[#99E515] rounded-md px-[16px] py-[8px]" onClick={()=>setOpenInvoke(true)}>
+                  {" "}
+                  Ask Question
+                </button>
+                <button className="border-[#99E515] border-[1px] rounded-md text-[#99E515] px-[16px] py-[8px] text-[14px] leading-[26px] tracking-[0.46px] ">
+                  Book Meeting
+                </button>
+              </div>
+            </>
+          )}
         </div>
         {/* orb status */}
       </div>

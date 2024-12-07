@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/redux/StoreProvider";
+import { ApolloClient, ApolloProvider, InMemoryCache, HttpLink, gql, useQuery, } from '@apollo/client' ;
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,12 +16,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const client = new ApolloClient({
+    uri: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO', // Replace with actual endpoint
+    cache: new InMemoryCache(),
+  });
   return (
     <html lang="en">
       <body className={inter.className}>
+     
         <ReduxProvider>
         {children}
         </ReduxProvider>
+        
         </body>
     </html>
   );

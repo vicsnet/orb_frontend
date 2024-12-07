@@ -1,18 +1,19 @@
 "use client"
+import { useAppSelector } from '@/redux/store'
 import Image from 'next/image'
 import { title } from 'process'
 import React, { useState } from 'react'
 
-const data =[
-    {id:1, title:'What function does Vincent’s Orb have?', content:' Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days.'},
-    {id:2, title:'What’s a Keeper?', content:' Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days.'},
-    {id:3, title:'Who is the Orb for?', content:' Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days.'},
-    {id:4, title:'What’s a “cooldown?', content:' Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days.'},
-    {id:5, title:'I’m still confused. Why am I paying money to hold the Orb!?', content:' Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days.'},
-]
+interface data{
+    title:string,
+    content:string
+}
 export default function Questions() {
     const[dataId, setDataId] = useState<Number | null>(null)
+    const question = useAppSelector((state)=>state.orbTermsReducer.orbTerms?.data || []);
 
+    console.log("que", question);
+    
     const handleSetId =async(id:Number)=>{
         setDataId(dataId === id ? null : id)
         
@@ -29,18 +30,18 @@ export default function Questions() {
         </div>
         <section className=" flex flex-col gap-4 mt-[40px]">
             {
-                data.map((details)=>(
+                question?.map((details:data, index:number)=>(
 
-        <div key={details.id} className=" w-[40%] mx-auto border-[1px] rounded-2xl px-4 py-6">
+        <div key={index} className=" w-[40%] mx-auto border-[1px] rounded-2xl px-4 py-6">
             <div className=" flex justify-between">
-                <h2 className="text-[24px] font-bold leading-[32.016px]">{details.title}</h2>
+                <h2 className="text-[24px] font-bold leading-[32.016px]">{details?.title}</h2>
 
-                <Image src={`/images/${dataId === details.id ? 'Close.svg' :'Plus.svg'}`} alt='FAQ' width={24} height={24} onClick={()=>{handleSetId(details.id)}} className='ease-in transition duration-300 cursor-pointer'/>
+                <Image src={`/images/${dataId === index? 'Close.svg' :'Plus.svg'}`} alt='FAQ' width={24} height={24} onClick={()=>{handleSetId(index)}} className='ease-in transition duration-300 cursor-pointer'/>
 
             </div>
             
-                <p className ={`text-[14px] font-normal leading-5 tracking-[0.17px] mt-[16px] ${dataId === details.id ? 'block' : 'hidden'} ease-in duration-500`}>
-                {details.content}
+                <p className ={`text-[14px] font-normal leading-5 tracking-[0.17px] mt-[16px] ${dataId === index ? 'block' : 'hidden'} ease-in duration-500`}>
+                {details?.content}
                 </p>
           
         </div>

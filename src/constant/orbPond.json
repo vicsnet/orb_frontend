@@ -1,0 +1,213 @@
+[
+  {
+    "type": "impl",
+    "name": "OrbPond",
+    "interface_name": "orbland::orb_pond::IOrbPondTrait"
+  },
+  {
+    "type": "struct",
+    "name": "core::integer::u256",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "type": "interface",
+    "name": "orbland::orb_pond::IOrbPondTrait",
+    "items": [
+      {
+        "type": "function",
+        "name": "create_orb",
+        "inputs": [
+          {
+            "name": "name_",
+            "type": "core::felt252"
+          },
+          {
+            "name": "symbol_",
+            "type": "core::felt252"
+          },
+          {
+            "name": "token_uri_1",
+            "type": "core::felt252"
+          },
+          {
+            "name": "token_uri_2",
+            "type": "core::felt252"
+          },
+          {
+            "name": "total_supply_",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "register_version",
+        "inputs": [
+          {
+            "name": "version_",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "orb_class_hash_",
+            "type": "core::starknet::class_hash::ClassHash"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "get_all_orb_addresses",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "version",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "set_orb_initial_version",
+        "inputs": [
+          {
+            "name": "orb_initial_version_",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "get_registry",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_owner",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "registry_",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "owner_",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "orbland::orb_pond::ORB_pond::OrbCreated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "contract_address",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "orbland::orb_pond::ORB_pond::VersionRegistration",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "version",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "orbland::orb_pond::ORB_pond::OrbInitialVersionUpdate",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "previous_version",
+        "type": "core::integer::u256",
+        "kind": "key"
+      },
+      {
+        "name": "orb_initial_version",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "orbland::orb_pond::ORB_pond::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "OrbCreated",
+        "type": "orbland::orb_pond::ORB_pond::OrbCreated",
+        "kind": "nested"
+      },
+      {
+        "name": "VersionRegistration",
+        "type": "orbland::orb_pond::ORB_pond::VersionRegistration",
+        "kind": "nested"
+      },
+      {
+        "name": "OrbInitialVersionUpdate",
+        "type": "orbland::orb_pond::ORB_pond::OrbInitialVersionUpdate",
+        "kind": "nested"
+      }
+    ]
+  }
+]

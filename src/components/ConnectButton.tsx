@@ -1,8 +1,10 @@
 import React from "react";
 // import {connect, disconnect} from 'get-starknet'
 
-import { connect, disconnect } from "@argent/get-starknet";
+import { connect, disconnect } from "get-starknet";
 import { RpcProvider, Provider } from "starknet";
+// import { WalletAccount } from 'starknet';
+import { WalletAccount } from 'starknet';
 import { useDispatch } from "react-redux";
 import { AppDispatch, useAppSelector } from "@/redux/store";
 import { walletConnect, walletDisConnect } from "@/redux/features/walletSlice";
@@ -11,18 +13,24 @@ export default function ConnectButton() {
   const dispatch = useDispatch<AppDispatch>();
   const accountStarknet  = useAppSelector((state) => state.walletReducer.starknetAccount);
 
+  
   const myFrontendProviderUrl =
-    "https://free-rpc.nethermind.io/sepolia-juno/v0_7";
+  "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
   async function connectWallet() {
     try {
-      const starknet = await connect();
+      const starknet = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
+      
+      
 
+      
+      
       const provider = new Provider({
-        rpc: {
+        // rpc: {
           nodeUrl: myFrontendProviderUrl,
-        },
-      });
+          // },
+        });
+     
 
       if (window.starknet) {
         window.starknet.provider = provider;
@@ -33,6 +41,7 @@ export default function ConnectButton() {
 
       if (starknet) {
         await starknet.enable();
+        // const myWalletAccount = new WalletAccount({ nodeUrl: myFrontendProviderUrl }, starknet);
         dispatch(walletConnect(starknet));
       }
       console.log(starknet);

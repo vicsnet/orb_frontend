@@ -1,0 +1,31 @@
+{
+    "oathSworn":"I, Domain Daniel, swear to honor my Orb as long as I am able, or until it is retired. I shall answer any permissible question dutifully to the best of my abilities – as long as answering does not bring me into conflict with the law or my ethical code, or compromise myself or others. The totality of my aggregate knowledge is at your disposal. This is my Orb, and I shall bear no other Orbs of this kind under the reign of this Orb. The blockchain bears my witness.",
+    "terms": "I will answer questions to the best of my ability according to the schedule defined by the Orb contract, subject to the clear constraints defined here and in the Oath. While I pledge to answer reliably, I reserve the right to refuse to answer any question. The intended use of the Orb is to surface knowledge, expertise, insight, analysis, and opinions. I will most likely not answer questions about my personal life, location, and friends and family. I will not answer questions about active portfolio companies. I will not answer any questions that require me to disclose nonpublic or privileged information. I will discuss investments and investment strategies, but I will not discuss my personal portfolio or that of Castle Island. I will not answer questions which pose a legal risk or endanger me, the asker, or anyone else. You may use the Orb to obtain feedback regarding a startup pitch but holding my Orb is no guarantee that I will consider a specific investment. The question you ask should be self-contained as I make no guarantees that I will click on links or read long passages of text to understand what you’re asking. You may reference text and other sources if you think it’s likely I have read them, but you cannot link me a document I’ve never seen before and ask me to review.",
+    "privacy": "Private questions and answers allowed, booking allowed",
+    "Exclusivity": "Keepers can read past Q&A and reveal their own",
+    "swornDate": "28/09/2024",
+    "honoredUntil":"02/10/2024",
+    "questions":[{
+        "title":"What function does Domain's Orb have?",
+        "content":"Different Orbs have different functions. Domain's Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+    },
+    {
+        "title":"Who is a Keeper?",
+        "content":"Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+    },
+    {
+        "title":"Who is the Orb for?",
+        "content":"Different Orbs have different  functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+    },
+    {
+        "title":"What’s a “cooldown?",
+        "content":"Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+    },
+    {
+        "title":"I’m still confused. Why am I paying money to hold the Orb!?",
+        "content":"Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+    }
+]
+ 
+}
+

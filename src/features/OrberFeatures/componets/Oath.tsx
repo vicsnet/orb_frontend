@@ -7,16 +7,40 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Contract, RpcProvider, shortString } from "starknet";
+import { PinataSDK } from "pinata-web3";
 
 interface data{
     oathSworn: string,
-    terms: string,
+    // terms: string,
     privacy: string,
     Exclusivity: string,
     swornDate: string
-    honoredUntil: string
+    // honoredUntil: string
 }
+
+interface OrbData {
+  oathSworn: string;
+  privacy: string;
+  Exclusivity: string;
+  swornDate: string;
+  questions: Question[];
+}
+
+interface Question {
+  title: string;
+  content: string;
+}
+
 export default function Oath() {
+
+  const [honoredUntil, setHonoredUntil] = useState<string>('')
+  const JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyYTBjNjg3MS04NGIxLTRlMDgtODg2ZC1iYmU5ODY5ZDQ4OWMiLCJlbWFpbCI6InZpbmNlLmFkZXNhbm1pMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZWQ2MGI4MzZiNGI3M2Q3OGU5NmYiLCJzY29wZWRLZXlTZWNyZXQiOiI2N2FjNWNmZTBhODIzYWEyYzA1ZDA5MDNhMDRiZWQ5YjM1MzllMDVkODkxZWMwNTRiYjM2OTBkMDUyMDdjN2NhIiwiZXhwIjoxNzcwMTEyODA3fQ.5zF5vDwlY_RHXz4lkckjovm1xbFxowIbqZvDf69QD0Y";
+
+  const pinata = new PinataSDK({
+    pinataJwt: JWT,
+    pinataGateway: "https://emerald-big-beaver-890.mypinata.cloud",
+  });
+
   const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
   const dispatch = useDispatch<AppDispatch>();
   const [orbHashData, setOrbHashData] = useState<null | data>(null);
@@ -30,13 +54,13 @@ export default function Oath() {
 // 0x0
 
 
-  const longString: string[] = shortString
-    .splitLongString(
-      "bafkreihxbmeuq2qtr2ywlrpkrb3zokjyslow34ynyfxkgybsosuyd6j25e"
-    )
-    .map((str) => shortString.encodeShortString(str));
+  // const longString: string[] = shortString
+  //   .splitLongString(
+  //     "bafkreihxbmeuq2qtr2ywlrpkrb3zokjyslow34ynyfxkgybsosuyd6j25e"
+  //   )
+  //   .map((str) => shortString.encodeShortString(str));
 
-  console.log("byteArr", longString);
+  // console.log("byteArr", longString);
 
   const fetchData = async () => {
     try {
@@ -52,17 +76,29 @@ export default function Oath() {
       const myContractCall = new Contract(testAbi, contract, provider);
 
       const orbHash = await myContractCall.get_oathHash();
+      const honoredUntil = await myContractCall.get_honored_until();
+      const epochTime = Number(honoredUntil)
+   const honoredDate = new Date(epochTime * 1000);
+   setHonoredUntil(honoredDate.toString());
       console.log('hash of orb', orbHash);
-      const hash = shortString.decodeShortString(orbHash.data.toString()) + shortString.decodeShortString(orbHash.pending_word.toString());
-   
-      const response = await axios.get(
-        `https://gateway.lighthouse.storage/ipfs/${hash}`,
-      );
+
+      if(orbHash !==""){
+        
+
+  
+  const response = await pinata.gateways.get(orbHash);
+  if (response.data && typeof response.data === 'object') {
+
+    const orbData = response.data as unknown as OrbData;
+    console.log('ddddd',response.data)
+    setOrbHashData(orbData);
+    const data = orbData.questions;
+    dispatch(getOrbTerms({data}));
+    console.log(data);
+  }
+
+      }
       
-      setOrbHashData(response?.data);
-      const data = response?.data?.questions;
-      dispatch(getOrbTerms({data}));
-      console.log(data);
       
       }
     } catch (error) {
@@ -72,7 +108,9 @@ export default function Oath() {
 
   useEffect(()=>{
     fetchData()
-  },[])
+  });
+
+
   return (
     <section className="w-[90%] mx-auto mt-[72px]">
       <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] ">
@@ -89,12 +127,14 @@ export default function Oath() {
         <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center flex">
           {orbHashData?.oathSworn}
         </p>
-          <p className="text-center  text-[20px] font-bold leading-[26px] tracking-[0.15px] mt-8 text-[#99E515]">Orbs Terms of Service</p> <br/>
-        <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center">
-          {orbHashData?.terms}
-        </p>
-      </div>
+ 
+        {/* //   <p className="text-center  text-[20px] font-bold leading-[26px] tracking-[0.15px] mt-8 text-[#99E515]">Orbs Terms of Service</p> <br/>
+        // <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center">
+        //   {orbHashData?.terms}
 
+
+        </p> */}
+      </div>
       <div className="flex flex-col gap-4 mt-[40px] w-[40%]">
         <div className="flex items-center gap-4">
           <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">
@@ -144,7 +184,7 @@ export default function Oath() {
 
           <div className="flex items-center">
             <p className="text-[14px] font-bold tracking-[0.46px] underline">
-              {orbHashData?.honoredUntil}
+              {honoredUntil}
             </p>
           </div>
         </div>

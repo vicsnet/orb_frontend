@@ -3,18 +3,23 @@ import { ProviderUrl } from "@/constant/contract";
 import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { Contract, RpcProvider, shortString } from "starknet";
+import { cairo, Contract, RpcProvider, shortString, WalletAccount } from "starknet";
 import { currentDate, epochToTime } from "@/constant/constant";
 import { LuDot } from "react-icons/lu";
 import { useDispatch } from "react-redux";
 import { getOrbPrice } from "@/redux/features/priceSlice";
 
+
 type OrbHeroProps = {
   setOpenPurchase: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenInvoke: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenOath: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenCooldown: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenPrice: React.Dispatch<React.SetStateAction<boolean>>;
+  cooldownDays: number
 };
 
-export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps) {
+export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays }: OrbHeroProps) {
   const description = useAppSelector(
     (state) => state.OrbDetailsReducer.OrbAccountDetails?.description
   );
@@ -30,6 +35,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps
   const [AddressFrac, setAddressFrac] = useState<any>(0);
   const [orbEndDate, setOrbEndDate] = useState("");
   const [orbToken, setOrbToken] = useState<any>(0);
+  const [oathHash, setOathHash] = useState<string>("")
   const decimal: number = 1000000000000000000;
 
   const fetchData = async () => {
@@ -46,6 +52,11 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps
         const myContractCall = new Contract(testAbi, contract, provider);
 
         const priceHash = await myContractCall.get_orb_price();
+
+        const oathHash = await myContractCall.get_oathHash();
+        setOathHash(oathHash);
+        // console.log('oathhh', oathHash);
+
 
         setPrice(priceHash.toString());
         dispatch(getOrbPrice({ price: priceHash.toString() }));
@@ -76,11 +87,52 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps
     }
   };
 
+  const startMyOrb = async () => {
+    const myFrontendProviderUrl =
+      "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
+
+    try {
+      if (contract !== null) {
+        console.log("starknetAccount", starknetAccount);
+        const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
+        const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+
+        const { abi: testAbi } = await provider.getClassAt(contract);
+
+        const myWalletAccount = new WalletAccount(
+          { nodeUrl: myFrontendProviderUrl },
+          starknetAccount as any
+        );
+
+        if (contract !== null && starknetAccount !== null) {
+          const contractCall = new Contract(
+            testAbi,
+            contract,
+            myWalletAccount
+          );
+
+
+          contractCall.connect(myWalletAccount);
+
+          const myCall = contractCall.populate("start_orb", []);
+
+          const res = await myWalletAccount.execute(myCall);
+          await provider.waitForTransaction(res.transaction_hash);
+          console.log(res.transaction_hash);
+        }
+      }
+
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     fetchData();
-    console.log('orbToken', orbToken);
-    
-  }, [orbToken]);
+    // console.log('orbToken', orbToken);
+
+  });
   return (
     <section className="w-[90%] mx-auto mt-[180px] relative">
       <div
@@ -139,6 +191,40 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps
               Active
             </p>
           </div>
+          <div className="flex justify-center gap-2 ">
+            {oathHash === "" && (
+              <button
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                onClick={() => setOpenOath(true)}
+              >
+                Swear Oath
+              </button>
+            )}
+
+            {cooldownDays === 0 && <button
+              className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+              onClick={() => setOpenCooldown(true)}
+            >
+              Set Cooldown Period
+            </button>}
+            {price === 0 &&
+              <button
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                onClick={() => setOpenPrice(true)}
+              >
+                Set Price
+              </button>
+            }
+            {
+              !orbStatus &&
+              <button
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                onClick={() => startMyOrb()}
+              >
+                Start Orb
+              </button>
+            }
+          </div>
           {orbToken === 0 && (
             <div className="flex justify-center">
               {orbStatus && (
@@ -152,7 +238,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps
             </div>
           )}
 
-          {orbToken >= 1 && (
+          {orbToken > 0 && (
             <>
               {/* if purchased */}
 
@@ -170,7 +256,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke }: OrbHeroProps
 
               {/* if purchased */}
               <div className="flex justify-center gap-4 mt-12 mb-8">
-                <button className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#121312] bg-[#99E515] rounded-md px-[16px] py-[8px]" onClick={()=>setOpenInvoke(true)}>
+                <button className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#121312] bg-[#99E515] rounded-md px-[16px] py-[8px]" onClick={() => setOpenInvoke(true)}>
                   {" "}
                   Ask Question
                 </button>

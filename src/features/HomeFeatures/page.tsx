@@ -1,5 +1,5 @@
-import Navbar from '@/components/Navbar'
 import React from 'react'
+import Navbar from '@/components/Navbar'
 import HeroSection from './components/HeroSection'
 import CreatorsContent from './components/CreatorsContent'
 import KnowMore from './components/KnowMore'

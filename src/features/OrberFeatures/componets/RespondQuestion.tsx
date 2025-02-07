@@ -3,15 +3,12 @@ import { useAppSelector } from '@/redux/store';
 import React, { useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { byteArray, cairo, CallData, Contract, RpcProvider, WalletAccount } from 'starknet';
-
-// import {StarknetWalletProvider }from 'get-starknet'
-
-
 interface  invokePros{
-    title: string | undefined
-    setOpenInvoke: React.Dispatch<React.SetStateAction<boolean>>;
+    // title: string | undefined
+    setOpenRespond: React.Dispatch<React.SetStateAction<boolean>>;
+    contentId:number
 }
-export default function AskQuestion({title, setOpenInvoke}:invokePros) {
+export default function RespondQuestion({ setOpenRespond, contentId}:invokePros) {
   const [content, setContent] = useState<string>('');
 
   const starknetAccount = useAppSelector(
@@ -19,7 +16,7 @@ export default function AskQuestion({title, setOpenInvoke}:invokePros) {
   );
   const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
 
-  const invokeOrb = async () =>{
+  const RespondToInvocation = async () =>{
     const myFrontendProviderUrl =
     "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
@@ -35,34 +32,31 @@ export default function AskQuestion({title, setOpenInvoke}:invokePros) {
 
         const myOrbContractCall = new Contract(testAbi, contract, provider);
         const buyerAddress = starknetAccount?.account.address;
-        const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
+        // const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
         const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
         // const contentHash = content;
         const contentHash = CallData.compile([byteArray.byteArrayFromString(content)]);
-        if(starknetAccount !== null){
-
-          const myWalletAccount = new WalletAccount(
-            { nodeUrl: myFrontendProviderUrl },
-            starknetAccount as any
-          );
-          const contractCall = new Contract(
-            invokeAbi,
-            orbInvocRegistryCA,
-            myWalletAccount
-          );
-    
-          contractCall.connect(myWalletAccount);
-          const myInvokeCall = contractCall.populate("invoke_with_hash", [
-            content,
-            contract,
-            cairo.uint256(Number(myOrbId)),
-          ]);
+        const myWalletAccount = new WalletAccount(
+          { nodeUrl: myFrontendProviderUrl },
+          starknetAccount as any
+        );
+        const contractCall = new Contract(
+          invokeAbi,
+          orbInvocRegistryCA,
+          myWalletAccount
+        );
   
-          const resToken = await myWalletAccount.execute(myInvokeCall);
-          await provider.waitForTransaction(resToken.transaction_hash);
-          console.log("resToken", resToken.transaction_hash);
-        }
+        contractCall.connect(myWalletAccount);
+        const myInvokeCall = contractCall.populate("respond", [
+            cairo.uint256(Number(contentId)),
+          content,
+          contract,
+        ]);
+
+        const resToken = await myWalletAccount.execute(myInvokeCall);
+        await provider.waitForTransaction(resToken.transaction_hash);
+        console.log("resToken", resToken.transaction_hash);
       }
 
 
@@ -81,13 +75,13 @@ export default function AskQuestion({title, setOpenInvoke}:invokePros) {
           <div className="flex justify-between">
             <p className=""></p>
             <h2 className="text-[20px] leading-8 text-[#FFFFFF] text-center">
-              Invoke {title}&apos;s Orb 
+            Respond to Invocation
             </h2>
             <span className="">
               <MdClose
                 size={24}
                 className=""
-                onClick={() => setOpenInvoke(false)}
+                onClick={() => setOpenRespond(false)}
               />
             </span>
           </div>
@@ -102,9 +96,9 @@ export default function AskQuestion({title, setOpenInvoke}:invokePros) {
           <div className="mt-6 mb-4">
             <div 
               className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center"
-              onClick={invokeOrb}
+              onClick={RespondToInvocation}
             >
-                Invoke
+                Respond
             </div>
           </div>
         </div>

@@ -6,8 +6,15 @@ import Questions from "./Questions";
 import OrbActivity from "./OrbActivity";
 import Invocation from "./Invocation";
 
-export default function MainSection() {
+type OrbHeroProps = {
+  setCooldownDays:React.Dispatch<React.SetStateAction<number>>
+
+};
+export default function MainSection({setCooldownDays}:OrbHeroProps) {
     const [name, setName] = useState<String>('about')
+
+  
+    
   return (
     <section>
       <div className="w-[30%] mx-auto flex border-[1px] border-[#99E515] rounded-[12px] px-2 py-4 -mt-[40px] relative z-10" style={{background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)'}}>
@@ -30,7 +37,7 @@ export default function MainSection() {
 {
     name === 'about' &&
       <section className="">
-        <AboutOrb />
+        <AboutOrb setCooldownDays={setCooldownDays} />
         <Oath/>
         <Questions/>
       </section>

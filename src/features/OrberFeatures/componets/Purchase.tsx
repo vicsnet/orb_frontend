@@ -2,9 +2,11 @@
 import { epochToTime } from "@/constant/constant";
 import { ProviderUrl, tokenAddress } from "@/constant/contract";
 import { useAppSelector } from "@/redux/store";
+import { connect, StarknetWindowObject } from "get-starknet";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
+
 import {
   Contract,
   RpcProvider,
@@ -12,9 +14,12 @@ import {
   Account,
   WalletAccount,
   cairo,
+  // StarknetWalletProvider
+  
 } from "starknet";
-// import { connect } from "@argent/get-starknet"
+// import { StarknetWalletProvider } from "get-starknet"
 // import { WalletAccount } from 'starknet';
+
 
 type OrbHeroProps = {
   setOpenPurchase: React.Dispatch<React.SetStateAction<boolean>>;
@@ -74,50 +79,57 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
         const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
         const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
         const buyerAddress = starknetAccount?.account.address;
-
+        // console.log();
+        
         const { abi: testAbi } = await provider.getClassAt(contract);
         const { abi: tokenAbi } = await provider.getClassAt(tokenAddress);
 
+        const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
         // const signer = starknetAccount?.account.signer;
-        const myWalletAccount = new WalletAccount(
-          { nodeUrl: myFrontendProviderUrl },
-          starknetAccount
-        );
+        if (starknetAccount !== null){
 
-        if (contractAddress !== null && starknetAccount !== null) {
-          const contractCall = new Contract(
-            testAbi,
-            contractAddress,
-            myWalletAccount
+          const myWalletAccount = new WalletAccount(
+            { nodeUrl: myFrontendProviderUrl },
+            starknetAccount as any
           );
-          const tokencontractCall = new Contract(
-            tokenAbi,
-            tokenAddress,
-            myWalletAccount
-          );
-          tokencontractCall.connect(myWalletAccount);
-          const myTokenCall = tokencontractCall.populate("approve", [
-            contractAddress,
-            cairo.uint256(Number(price)),
-          ]);
-
-          const resToken = await myWalletAccount.execute(myTokenCall);
-          await provider.waitForTransaction(resToken.transaction_hash);
-          console.log("resToken", resToken.transaction_hash);
-
-          if (resToken) {
-            contractCall.connect(myWalletAccount);
-
-            const myCall = contractCall.populate("buy_orb", [
-              buyerAddress,
-              cairo.uint256(Number(price)),
+  
+          console.log(myWalletAccount, `myWalletAccount`);
+          
+          if (contractAddress !== null && starknetAccount !== null) {
+            const contractCall = new Contract(
+              testAbi,
+              contractAddress,
+              myWalletAccount
+            );
+            const tokencontractCall = new Contract(
+              tokenAbi,
               tokenAddress,
-              cairo.uint256(Number(1)),
+              myWalletAccount
+            );
+            tokencontractCall.connect(myWalletAccount);
+            const myTokenCall = tokencontractCall.populate("approve", [
+              contractAddress,
+              cairo.uint256(Number(price)),
             ]);
-
-            const res = await myWalletAccount.execute(myCall);
-            await provider.waitForTransaction(res.transaction_hash);
-            console.log(res.transaction_hash);
+  
+            const resToken = await myWalletAccount.execute(myTokenCall);
+            await provider.waitForTransaction(resToken.transaction_hash);
+            console.log("resToken", resToken.transaction_hash);
+  
+            if (resToken) {
+              contractCall.connect(myWalletAccount);
+  
+              const myCall = contractCall.populate("buy_orb", [
+                buyerAddress,
+                cairo.uint256(Number(price)),
+                tokenAddress,
+                cairo.uint256(Number(1)),
+              ]);
+  
+              const res = await myWalletAccount.execute(myCall);
+              await provider.waitForTransaction(res.transaction_hash);
+              console.log(res.transaction_hash);
+            }
           }
         }
       }
@@ -128,7 +140,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  });
 
   return (
     <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
@@ -156,7 +168,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
               />
               <div className="">
                 <p className="text-[16px] font-bold leading-5 tracking-[0.1px] text-[#FFFFFF]">
-                  {data?.name}'s Orb
+                  {data?.name}&apos;s Orb
                 </p>
                 <p className="text-[14px]">
                   Created by {data?.creator} @{data?.x_account}

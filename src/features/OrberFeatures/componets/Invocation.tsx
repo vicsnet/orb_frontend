@@ -13,7 +13,7 @@ export default function Invocation() {
         <section className='flex flex-col gap-4'>
 
         <OrbInvocationContent/>
-        <OrbInvocationPrivate/>
+        {/* <OrbInvocationPrivate/> */}
         </section>
         </section >
   )

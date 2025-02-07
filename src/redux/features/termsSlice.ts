@@ -3,30 +3,30 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface Question {
     title: string;
     content: string;
-  }
-interface Data{
-    data:Question[]
 }
-type InitialState ={
+interface Data {
+    data: Question[]
+}
+type InitialState = {
     orbTerms: Data | null,
 }
 
-const initialState= {
-    orbTerms:null,
+const initialState = {
+    orbTerms: null,
 } as InitialState
 
 
 export const orbTerms = createSlice({
-    name:"OrbTerm",
+    name: "OrbTerm",
     initialState,
-    reducers:{
-        getOrbTerms(state, action:PayloadAction<Data>){
-            return{
-                orbTerms:action.payload,
+    reducers: {
+        getOrbTerms(state, action: PayloadAction<Data>) {
+            return {
+                orbTerms: action.payload,
             }
         }
     }
 })
 
-export const {getOrbTerms} =  orbTerms.actions;
+export const { getOrbTerms } = orbTerms.actions;
 export default orbTerms.reducer;

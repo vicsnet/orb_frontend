@@ -7,15 +7,15 @@ import orbPond from "@/constant/orbPond.json";
 import { getAddress } from "@ethersproject/address";
 import { orbPondCA, ProviderUrl } from "@/constant/contract";
 import { Contract, hash, num, RpcProvider } from "starknet";
-import { useAppSelector } from "@/redux/store";
-import {
-  ApolloClient,
-  ApolloProvider,
-  InMemoryCache,
-  HttpLink,
-  gql,
-  useQuery,
-} from "@apollo/client";
+// import { useAppSelector } from "@/redux/store";
+// import {
+//   ApolloClient,
+//   ApolloProvider,
+//   InMemoryCache,
+//   HttpLink,
+//   gql,
+//   useQuery,
+// } from "@apollo/client";
 
 
 
@@ -67,14 +67,14 @@ export default function CreatorsContent() {
           {
             orbAddresses !== null &&
             <>
-          {orbAddresses?.map((data) => 
+          {orbAddresses?.map((data, index) => 
         
           {
             console.log('orb data', data);
             
           return(
             
-            <div className="" >
+            <div key={index} className="" >
 
               <SingleCreator
               address={data}

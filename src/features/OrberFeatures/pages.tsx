@@ -5,14 +5,18 @@ import Image from "next/image";
 import React, { useState } from "react";
 import OrbHero from "./componets/OrbHero";
 import MainSection from "./componets/MainSection";
-import { useAppSelector } from "@/redux/store";
+// import { useAppSelector } from "@/redux/store";
 import Purchase from "../OrberFeatures/componets/Purchase";
 import AskQuestion from "./componets/AskQuestion";
 import SwearOath from "./componets/SwearOath";
 import CoolDownPeriod from "./componets/CoolDownPeriod";
 import SetPrice from "./componets/SetPrice";
+import { useOrbDetailsStore } from "@/zustand/Wallet";
+
 export default function OrberFeatures() {
-  const orbName = useAppSelector((state)=>state.OrbDetailsReducer.OrbAccountDetails?.name);
+  // const orbName = useAppSelector((state)=>state?.OrbDetailsReducer.OrbAccountDetails?.name);
+
+  const {name} = useOrbDetailsStore()
   const [openPurchase, setOpenPurchase] = useState<boolean>(false)
   const [openInvoke, setOpenInvoke] = useState<boolean>(false)
   const [openOath, setOpenOath] = useState<boolean>(false)
@@ -37,7 +41,7 @@ export default function OrberFeatures() {
           />
         </div>
         <div className="absolute top-0 w-[100%]">
-        <Navbar title={`${orbName}'s Orb` }/>
+        <Navbar title={`${name}'s Orb` }/>
 
         <div className="">
             <OrbHero setOpenInvoke={setOpenInvoke}setOpenPurchase={setOpenPurchase} setOpenOath={setOpenOath} setOpenCooldown={setOpenCooldown} setOpenPrice={setOpenPrice} cooldownDays={cooldownDays} />
@@ -52,10 +56,10 @@ export default function OrberFeatures() {
             }
 
             { openInvoke &&
-              <AskQuestion setOpenInvoke={setOpenInvoke} title={orbName}/>
+              <AskQuestion setOpenInvoke={setOpenInvoke} title={name as string}/>
               }
                 { openOath &&
-              <SwearOath setOpenOath={setOpenOath} title={orbName}/>
+              <SwearOath setOpenOath={setOpenOath} title={name as string}/>
               }
 
               {

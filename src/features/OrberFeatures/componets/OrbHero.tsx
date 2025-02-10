@@ -1,13 +1,14 @@
 "use client";
 import { ProviderUrl } from "@/constant/contract";
-import { useAppSelector } from "@/redux/store";
+// import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { cairo, Contract, RpcProvider, shortString, WalletAccount } from "starknet";
 import { currentDate, epochToTime } from "@/constant/constant";
 import { LuDot } from "react-icons/lu";
 import { useDispatch } from "react-redux";
-import { getOrbPrice } from "@/redux/features/priceSlice";
+// import { getOrbPrice } from "@/redux/features/priceSlice";
+import {useOrbDetailsStore, useOrbprice, useWalletStore} from "@/zustand/Wallet"
 
 
 type OrbHeroProps = {
@@ -20,16 +21,21 @@ type OrbHeroProps = {
 };
 
 export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays }: OrbHeroProps) {
-  const description = useAppSelector(
-    (state) => state.OrbDetailsReducer.OrbAccountDetails?.description
-  );
-  const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
 
-  const starknetAccount = useAppSelector(
-    (state) => state.walletReducer.starknetAccount
-  );
-  const dispatch = useDispatch();
-  const [price, setPrice] = useState<any>(0);
+  const {setOrbPrice, price} = useOrbprice()
+  const {starknetAccount} =useWalletStore()
+  // const description = useAppSelector(
+  //   (state) => state?.OrbDetailsReducer?.OrbAccountDetails?.description
+  // );
+  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
+
+  const {address, description} = useOrbDetailsStore()
+
+  // const starknetAccount2 = useAppSelector(
+  //   (state) => state?.walletReducer?.starknetAccount
+  // );
+  // const dispatch = useDispatch();
+  const [myOrbprice, setMyOrbPrice] = useState<any>(0);
   const [orbStatus, setOrbStatus] = useState<boolean>(false);
   const [totalFracOrb, setTotalFracOrb] = useState<any>(0);
   const [AddressFrac, setAddressFrac] = useState<any>(0);
@@ -42,14 +48,16 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     try {
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
 
-      if (contract !== null) {
-        const { abi: testAbi } = await provider.getClassAt(contract);
+      if (address !== null) {
+        console.log('contract', address);
+        
+        const { abi: testAbi } = await provider.getClassAt(address);
 
         if (testAbi === undefined) {
           throw new Error("no abi.");
         }
 
-        const myContractCall = new Contract(testAbi, contract, provider);
+        const myContractCall = new Contract(testAbi, address, provider);
 
         const priceHash = await myContractCall.get_orb_price();
 
@@ -57,9 +65,11 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         setOathHash(oathHash);
         // console.log('oathhh', oathHash);
 
-
-        setPrice(priceHash.toString());
-        dispatch(getOrbPrice({ price: priceHash.toString() }));
+       
+        setMyOrbPrice(priceHash.toString());
+        // remove dispatch
+        // dispatch(getOrbPrice({ price: priceHash.toString() }));
+        setOrbPrice(priceHash.toString());
 
         const orbStatus = await myContractCall.get_orb_status();
         setOrbStatus(orbStatus);
@@ -69,9 +79,11 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         setOrbEndDate(epochTimeConversion);
 
         const totalOrb = await myContractCall.get_total_supply();
+        console.log('totalOrb', totalOrb);
+        
         setTotalFracOrb(totalOrb.toString());
         const totalAddressFrac = await myContractCall.my_fractioned_balance(
-          contract
+          address
         );
         setAddressFrac(totalAddressFrac.toString());
         if (starknetAccount) {
@@ -92,22 +104,22 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
     try {
-      if (contract !== null) {
+      if (address !== null) {
         console.log("starknetAccount", starknetAccount);
         const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
         const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
 
-        const { abi: testAbi } = await provider.getClassAt(contract);
+        const { abi: testAbi } = await provider.getClassAt(address);
 
         const myWalletAccount = new WalletAccount(
           { nodeUrl: myFrontendProviderUrl },
           starknetAccount as any
         );
 
-        if (contract !== null && starknetAccount !== null) {
+        if (address !== null && starknetAccount !== null) {
           const contractCall = new Contract(
             testAbi,
-            contract,
+            address,
             myWalletAccount
           );
 
@@ -132,7 +144,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     fetchData();
     // console.log('orbToken', orbToken);
 
-  });
+  },[]);
   return (
     <section className="w-[90%] mx-auto mt-[180px] relative">
       <div
@@ -164,7 +176,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               Orb Price
             </h2>
             <p className="text-white font-bold leading-[32.016px] text-center">
-              {price / decimal} Strk
+              {Number(myOrbprice) / decimal} Strk
             </p>
           </div>
 
@@ -207,7 +219,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             >
               Set Cooldown Period
             </button>}
-            {price === 0 &&
+            {Number(price) === 0  || Number(price) === null &&
               <button
                 className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenPrice(true)}

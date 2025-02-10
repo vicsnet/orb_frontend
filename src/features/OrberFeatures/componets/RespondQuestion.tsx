@@ -1,20 +1,26 @@
 import { orbInvocRegistryCA } from '@/constant/contract';
-import { useAppSelector } from '@/redux/store';
+// import { useAppSelector } from '@/redux/store';
 import React, { useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { byteArray, cairo, CallData, Contract, RpcProvider, WalletAccount } from 'starknet';
+import {useOrbDetailsStore, useWalletStore} from "@/zustand/Wallet"
+
 interface  invokePros{
     // title: string | undefined
     setOpenRespond: React.Dispatch<React.SetStateAction<boolean>>;
     contentId:number
 }
 export default function RespondQuestion({ setOpenRespond, contentId}:invokePros) {
+
+  const {starknetAccount} = useWalletStore()
   const [content, setContent] = useState<string>('');
 
-  const starknetAccount = useAppSelector(
-    (state) => state.walletReducer.starknetAccount
-  );
-  const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
+  // const starknetAccount2 = useAppSelector(
+  //   (state) => state?.walletReducer?.starknetAccount
+  // );
+  
+  const {address} = useOrbDetailsStore();
+  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
 
   const RespondToInvocation = async () =>{
     const myFrontendProviderUrl =
@@ -23,14 +29,14 @@ export default function RespondQuestion({ setOpenRespond, contentId}:invokePros)
     try {
       const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-      if(contract !== null){
+      if(address !== null){
 
-        const {abi: testAbi } = await provider.getClassAt(contract);
+        const {abi: testAbi } = await provider.getClassAt(address);
         if (testAbi === undefined) {
           throw new Error("no abi.");
         }
 
-        const myOrbContractCall = new Contract(testAbi, contract, provider);
+        const myOrbContractCall = new Contract(testAbi, address, provider);
         const buyerAddress = starknetAccount?.account.address;
         // const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
@@ -51,7 +57,7 @@ export default function RespondQuestion({ setOpenRespond, contentId}:invokePros)
         const myInvokeCall = contractCall.populate("respond", [
             cairo.uint256(Number(contentId)),
           content,
-          contract,
+          address,
         ]);
 
         const resToken = await myWalletAccount.execute(myInvokeCall);

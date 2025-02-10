@@ -1,7 +1,7 @@
 "use client"
 import { epochToTime, padHexAddress, timeAgo } from '@/constant/constant';
 import { orbInvocRegistryCA } from '@/constant/contract';
-import { useAppSelector } from '@/redux/store';
+// import { useAppSelector } from '@/redux/store';
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { FaComment } from "react-icons/fa";
@@ -9,6 +9,7 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { ByteArray, byteArray, cairo, Contract, hash, num, RpcProvider, uint256, Uint256, WalletAccount, } from 'starknet';
 import RespondQuestion from './RespondQuestion';
 // import {StarknetWalletProvider} from 'get-starknet'
+import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
 
 interface EMITTED_EVENT {
     // blockHash: string;
@@ -19,13 +20,15 @@ interface EMITTED_EVENT {
     transaction_hash: string;
 }
 export default function OrbInvocationContent() {
+    const { starknetAccount } = useWalletStore()
 
+    // const starknetAccount2 = useAppSelector(
+    //     (state) => state?.walletReducer?.starknetAccount
+    // );
 
-    const starknetAccount = useAppSelector(
-        (state) => state.walletReducer.starknetAccount
-    );
+    // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
+    const { address } = useOrbDetailsStore();
 
-    const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
     const [contentData, setContentData] = useState<EMITTED_EVENT[]>([])
     const [respData, setRespData] = useState<EMITTED_EVENT[]>([])
     const [openRespond, setOpenRespond] = useState<boolean>(false)
@@ -62,25 +65,25 @@ export default function OrbInvocationContent() {
 
         console.log('result2..', recentDate);
 
-        const address = eventsList.events[1].data[2]
-        console.log('address', address);
+        const address2 = eventsList.events[1].data[2]
+        console.log('address', address2);
 
-        const invocIdUint256: Uint256 = { low: eventsList.events[1].data[0], high: eventsList.events[1].data[1], }
+        // const invocIdUint256: Uint256 = { low: eventsList.events[1].data[0], high: eventsList.events[1].data[1], }
 
-        const invocId = uint256.uint256ToBN(invocIdUint256)
-        console.log('invocId', Number(invocId))
+        // // const invocId = uint256.uint256ToBN(invocIdUint256)
+        // // console.log('invocId', Number(invocId))
 
         const data = eventsList.events;
 
 
         const filteredData = data.filter(item => {
             const originalAddress = padHexAddress(item.keys[1])
-            const match = originalAddress === contract?.toLowerCase();
+            const match = originalAddress === address?.toLowerCase();
             return match;
         });
 
-        setContentData(filteredData)
         console.log('filteredDataaaa', filteredData);
+        setContentData(filteredData)
 
         const ResponseFilter = [[num.toHex(hash.starknetKeccak('Response')), '0x8'],];
 
@@ -98,7 +101,7 @@ export default function OrbInvocationContent() {
 
         const filterResponse = responseData.filter(item => {
             const originalAddress = padHexAddress(item.keys[1])
-            const match = originalAddress === contract?.toLowerCase();
+            const match = originalAddress === address?.toLowerCase();
 
             const invocIdUint2562: Uint256 = { low: item.data[0], high: item.data[1], }
 
@@ -127,14 +130,14 @@ export default function OrbInvocationContent() {
         try {
             const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
             const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-            if (contract !== null) {
+            if (address !== null) {
 
-                const { abi: testAbi } = await provider.getClassAt(contract);
+                const { abi: testAbi } = await provider.getClassAt(address);
                 if (testAbi === undefined) {
                     throw new Error("no abi.");
                 }
 
-                const myOrbContractCall = new Contract(testAbi, contract, provider);
+                const myOrbContractCall = new Contract(testAbi, address, provider);
                 const buyerAddress = starknetAccount?.account.address;
                 const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
@@ -154,7 +157,7 @@ export default function OrbInvocationContent() {
                 contractCall.connect(myWalletAccount);
                 const myInvokeCall = contractCall.populate("rate_positive_reponse", [
 
-                    contract,
+                    address,
                     cairo.uint256(Number(id)),
                     cairo.uint256(Number(myOrbId)),
                 ]);
@@ -185,14 +188,14 @@ export default function OrbInvocationContent() {
         try {
             const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
             const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-            if (contract !== null) {
+            if (address !== null) {
 
-                const { abi: testAbi } = await provider.getClassAt(contract);
+                const { abi: testAbi } = await provider.getClassAt(address);
                 if (testAbi === undefined) {
                     throw new Error("no abi.");
                 }
 
-                const myOrbContractCall = new Contract(testAbi, contract, provider);
+                const myOrbContractCall = new Contract(testAbi, address, provider);
                 const buyerAddress = starknetAccount?.account.address;
                 const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
@@ -212,7 +215,7 @@ export default function OrbInvocationContent() {
                 contractCall.connect(myWalletAccount);
                 const myInvokeCall = contractCall.populate("flag_response", [
 
-                    contract,
+                    address,
                     cairo.uint256(Number(id)),
                     cairo.uint256(Number(myOrbId)),
                 ]);
@@ -237,7 +240,7 @@ export default function OrbInvocationContent() {
 
     useEffect(() => {
         getInvocation()
-    })
+    }, [])
 
     return (
         <div className="relative">

@@ -5,13 +5,15 @@ import { connect, disconnect } from "get-starknet";
 import { RpcProvider, Provider } from "starknet";
 // import { WalletAccount } from 'starknet';
 import { WalletAccount } from 'starknet';
-import { useDispatch } from "react-redux";
-import { AppDispatch, useAppSelector } from "@/redux/store";
-import { walletConnect, walletDisConnect } from "@/redux/features/walletSlice";
+// import { useDispatch } from "react-redux";
+// import { AppDispatch, useAppSelector } from "@/redux/store";
+// import { walletConnect, walletDisConnect } from "@/redux/features/walletSlice";
+import  {useWalletStore} from "@/zustand/Wallet";
 
 export default function ConnectButton() {
-  const dispatch = useDispatch<AppDispatch>();
-  const accountStarknet = useAppSelector((state) => state.walletReducer.starknetAccount);
+  // const dispatch = useDispatch<AppDispatch>();
+  // const accountStarknet = useAppSelector((state) => state.walletReducer.starknetAccount);
+const {setStarknetAccount, setDisconnectAccount, starknetAccount} = useWalletStore()
 
 
   const myFrontendProviderUrl =
@@ -37,7 +39,12 @@ export default function ConnectButton() {
       if (starknet) {
         await starknet.enable();
         // const myWalletAccount = new WalletAccount({ nodeUrl: myFrontendProviderUrl }, starknet);
-        dispatch(walletConnect(starknet));
+        // const data  = walletConnect(starknet);
+        const data = starknet;
+        console.log('ddddata', data);
+        
+        setStarknetAccount(data);
+        // dispatch(walletConnect(starknet));
       }
       console.log(starknet);
     } catch (error) {
@@ -47,25 +54,30 @@ export default function ConnectButton() {
 
   const disconnectWallet = async () => {
     await disconnect();
-    dispatch(walletDisConnect())
+    setDisconnectAccount();
+    
+    
+    // dispatch(walletDisConnect())
   }
+
+  console.log('ddddata',starknetAccount);
 
   return (
     <div className="">
       {
-        accountStarknet ?
+        starknetAccount ?
           <div
-            onClick={accountStarknet ? disconnectWallet : connectWallet}
+            onClick={starknetAccount ? disconnectWallet : connectWallet}
             className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2"
           >
-            {accountStarknet.account.address.slice(0, 4)}
+            {starknetAccount?.account?.address.slice(0, 4)}
             ...
-            {accountStarknet.account.address.slice(-4)}
+            {starknetAccount?.account.address.slice(-4)}
           </div>
           :
           <div
             onClick={connectWallet}
-            className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2"
+            className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 cursor-pointer"
           >
             Connect Wallet
           </div>

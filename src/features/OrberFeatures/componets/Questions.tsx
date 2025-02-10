@@ -1,5 +1,6 @@
 "use client"
-import { useAppSelector } from '@/redux/store'
+// import { useAppSelector } from '@/redux/store'
+import { useOrbtermsStore } from '@/zustand/Wallet'
 import Image from 'next/image'
 import { title } from 'process'
 import React, { useState } from 'react'
@@ -10,9 +11,9 @@ interface data{
 }
 export default function Questions() {
     const[dataId, setDataId] = useState<Number | null>(null)
-    const question = useAppSelector((state)=>state.orbTermsReducer.orbTerms?.data || []);
 
-    console.log("que", question);
+    const {data} = useOrbtermsStore() ;
+  
     
     const handleSetId =async(id:Number)=>{
         setDataId(dataId === id ? null : id)
@@ -30,7 +31,7 @@ export default function Questions() {
         </div>
         <section className=" flex flex-col gap-4 mt-[40px]">
             {
-                question?.map((details:data, index:number)=>(
+                data?.map((details:data, index:number)=>(
 
         <div key={index} className=" w-[40%] mx-auto border-[1px] rounded-2xl px-4 py-6">
             <div className=" flex justify-between">

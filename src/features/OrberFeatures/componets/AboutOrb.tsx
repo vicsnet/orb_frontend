@@ -1,4 +1,5 @@
-import { useAppSelector } from '@/redux/store'
+// import { useAppSelector } from '@/redux/store'
+import { useOrbDetailsStore } from '@/zustand/Wallet';
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { num, RpcProvider, hash, Uint256, uint256 } from 'starknet';
@@ -9,8 +10,9 @@ type OrbHeroProps = {
 };
 
 export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
-    const orbDetail = useAppSelector((state) => state.OrbDetailsReducer.OrbAccountDetails)
-    const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
+    const { name, address } = useOrbDetailsStore();
+    // const orbDetail = useAppSelector((state) => state?.OrbDetailsReducer?.OrbAccountDetails)
+    // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
 
     const [cooldown, setCooldown] = useState<number>(0)
 
@@ -22,7 +24,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
 
         const lastBlock = await provider.getBlock('latest');
         const keyFilter = [[num.toHex(hash.starknetKeccak('CooldownUpdate')), '0x8']];
-        const addr = contract as string;
+        const addr = address as string;
         const eventsList = await provider.getEvents({
             address: addr,
             //   from_block: { block_number: lastBlock.block_number - 9 },
@@ -42,7 +44,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
 
     useEffect(() => {
         getCoolDown()
-    })
+    }, [])
     return (
         <section className='w-[90%] mx-auto'>
             <div className="w-[40%]">
@@ -60,8 +62,8 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                         <p className="">..................................................................................</p>
 
                         <div className="flex items-center">
-                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{orbDetail?.name}</p>
-                            <Image src='/images/Group.svg' alt={orbDetail?.name !== undefined ? orbDetail.name : 'orb creator'} width={16} height={16} />
+                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{name}</p>
+                            <Image src='/images/Group.svg' alt={ name !== null && name !== undefined ? name : 'orb creator'} width={16} height={16} />
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -69,8 +71,8 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                         <p className="">.................................................................................</p>
 
                         <div className="flex items-center">
-                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{`${contract?.slice(0, 5)}..${contract?.slice(-3)}`}</p>
-                            <Image src='/images/Group.svg' alt={orbDetail?.name !== undefined ? orbDetail.name : 'orb creator'} width={16} height={16} />
+                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{`${address?.slice(0, 5)}..${address?.slice(-3)}`}</p>
+                            <Image src='/images/Group.svg' alt={name !== undefined  && name !== null ? name : 'orb creator'} width={16} height={16} />
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

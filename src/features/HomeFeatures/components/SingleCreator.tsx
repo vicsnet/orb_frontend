@@ -1,13 +1,14 @@
 "use client"
 import { ProviderUrl } from '@/constant/contract';
-import { getOrbData } from '@/redux/features/orbSlice';
-import { AppDispatch } from '@/redux/store';
+// import { getOrbData } from '@/redux/features/orbSlice';
+// import { AppDispatch } from '@/redux/store';
 import axios from 'axios';
 import Image from 'next/image'
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { cairo, Contract, RpcProvider, shortString } from 'starknet';
+import {useOrbDetailsStore} from '@/zustand/Wallet'
 
 interface CreatorProps {
   address: string,
@@ -24,11 +25,13 @@ interface Data {
   farcater: string
 }
 export default function SingleCreator(props: CreatorProps) {
+
   const [data, setData] = useState<Data | null>(null);
   const [address, setAddress] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const {setOrbDetailsData} = useOrbDetailsStore()
 
-  const dispatch = useDispatch<AppDispatch>()
+  // const dispatch = useDispatch<AppDispatch>()
 
   const fetchData = async () => {
     const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
@@ -100,7 +103,11 @@ export default function SingleCreator(props: CreatorProps) {
         <h2 className="text-[24px] font-bold leading-[32.016px]">{!loading && data?.name}&#39;s Orb</h2>
         <p className="text-[14px] font-bold tracking-[0.1px]">[@{!loading && data?.x_account}]</p>
         <p className="text-[14px] font-bold tracking-[0.1px]">created by {!loading && data?.creator}</p>
-        <button onClick={() => { data !== null && dispatch(getOrbData({ data, account: address })) }} className='bg-[#99E515] mt-3 text-[14px] font-bold leading-[24px] tracking-[0.4px] text-center w-[156px] h-[32px] rounded-[6px] text-[#121312]'>
+        <button onClick={() => { data !== null && 
+          // dispatch(getOrbData({ data, account: address })) 
+          setOrbDetailsData(data.name, data.description, data.image, data.creator, data.x_account, data.farcater, address)
+          
+          }} className='bg-[#99E515] mt-3 text-[14px] font-bold leading-[24px] tracking-[0.4px] text-center w-[156px] h-[32px] rounded-[6px] text-[#121312]'>
           <Link href={{
             pathname: `/${address}`,
             query: { orb: `${data?.name}` },

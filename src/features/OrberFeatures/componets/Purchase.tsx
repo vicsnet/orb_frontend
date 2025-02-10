@@ -1,11 +1,12 @@
 "use client";
 import { epochToTime } from "@/constant/constant";
 import { ProviderUrl, tokenAddress } from "@/constant/contract";
-import { useAppSelector } from "@/redux/store";
+// import { useAppSelector } from "@/redux/store";
 import { connect, StarknetWindowObject } from "get-starknet";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
+import {useWalletStore, useOrbprice, useOrbDetailsStore} from "@/zustand/Wallet"
 
 import {
   Contract,
@@ -25,36 +26,46 @@ type OrbHeroProps = {
   setOpenPurchase: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
-  const data = useAppSelector(
-    (state) => state.OrbDetailsReducer.OrbAccountDetails
-  );
+  const {starknetAccount} = useWalletStore()
+  const {price} = useOrbprice()
 
-  const starknetAccount = useAppSelector(
-    (state) => state.walletReducer.starknetAccount
-  );
+  // const data = useAppSelector(
+  //   (state) => state?.OrbDetailsReducer?.OrbAccountDetails
+  // );
 
-  const price = useAppSelector((state) => state.PriceDataReducer.price);
+        const { name,
+            description,
+            image,
+            creator,
+            x_account,
+            farcaster,
+            address } = useOrbDetailsStore();
+  // const starknetAccount2 = useAppSelector(
+  //   (state) => state?.walletReducer?.starknetAccount
+  // );
+
+  // const price = useAppSelector((state) => state?.PriceDataReducer?.price);
   // const price:number = Number(633333333333333336)
   console.log("pricee", price);
 
-  const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
-  const contractAddress = useAppSelector(
-    (state) => state.OrbDetailsReducer.address
-  );
+  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
+  // const contractAddress = useAppSelector(
+  //   (state) => state?.OrbDetailsReducer?.address
+  // );
   const [invocPeriod, setInvocPeriod] = useState<any>(0);
   const [honoredTime, setHonoredTime] = useState<any>(0);
 
   const fetchData = async () => {
     try {
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-      if (contract !== null) {
-        const { abi: testAbi } = await provider.getClassAt(contract);
+      if (address !== null) {
+        const { abi: testAbi } = await provider.getClassAt(address);
 
         if (testAbi === undefined) {
           throw new Error("no abi.");
         }
 
-        const myContractCall = new Contract(testAbi, contract, provider);
+        const myContractCall = new Contract(testAbi, address, provider);
 
         const InvocationTime = await myContractCall.get_invocation_period();
         console.log("InvocationTime", InvocationTime);
@@ -74,14 +85,14 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
     try {
-      if (contract !== null) {
+      if (address !== null) {
         console.log("starknetAccount", starknetAccount);
         const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
         const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
         const buyerAddress = starknetAccount?.account.address;
         // console.log();
         
-        const { abi: testAbi } = await provider.getClassAt(contract);
+        const { abi: testAbi } = await provider.getClassAt(address);
         const { abi: tokenAbi } = await provider.getClassAt(tokenAddress);
 
         const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
@@ -95,10 +106,10 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
   
           console.log(myWalletAccount, `myWalletAccount`);
           
-          if (contractAddress !== null && starknetAccount !== null) {
+          if (address !== null && starknetAccount !== null) {
             const contractCall = new Contract(
               testAbi,
-              contractAddress,
+              address,
               myWalletAccount
             );
             const tokencontractCall = new Contract(
@@ -108,7 +119,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
             );
             tokencontractCall.connect(myWalletAccount);
             const myTokenCall = tokencontractCall.populate("approve", [
-              contractAddress,
+              address,
               cairo.uint256(Number(price)),
             ]);
   
@@ -140,7 +151,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
 
   useEffect(() => {
     fetchData();
-  });
+  },[]);
 
   return (
     <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
@@ -161,17 +172,17 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
           <div className="flex justify-between mt-9 mb-9 items-center bg-[#303033] py-[15px] px-[20px] rounded-lg">
             <div className="flex gap-4 items-center">
               <Image
-                src={data?.image ? data?.image : "/images/hero.png"}
+                src={image ? image : "/images/hero.png"}
                 alt=""
                 width={80}
                 height={80}
               />
               <div className="">
                 <p className="text-[16px] font-bold leading-5 tracking-[0.1px] text-[#FFFFFF]">
-                  {data?.name}&apos;s Orb
+                  {name}&apos;s Orb
                 </p>
                 <p className="text-[14px]">
-                  Created by {data?.creator} @{data?.x_account}
+                  Created by {creator} @{x_account}
                 </p>
               </div>
             </div>

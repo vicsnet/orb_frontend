@@ -37,7 +37,7 @@ export default function CreatorsContent() {
 
       const orbAddresses = await myContractCall.get_all_orb_addresses();
       setOrbAddresses(orbAddresses);
-      console.log("All orbAddresses",orbAddresses)
+      // console.log("All orbAddresses",orbAddresses)
 
 
     } catch (error) {
@@ -48,7 +48,7 @@ export default function CreatorsContent() {
   useEffect(() => {
     fetchData(); 
     
-  }, []);
+  },[]);
 
   return (
     <section className="mt-[96px]">
@@ -70,7 +70,7 @@ export default function CreatorsContent() {
           {orbAddresses?.map((data, index) => 
         
           {
-            console.log('orb data', data);
+            // console.log('orb data', data);
             
           return(
             

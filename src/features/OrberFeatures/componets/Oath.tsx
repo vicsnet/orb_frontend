@@ -1,21 +1,22 @@
 "use client";
 import { ProviderUrl } from "@/constant/contract";
-import { getOrbTerms } from "@/redux/features/termsSlice";
-import { AppDispatch, useAppSelector } from "@/redux/store";
+// import { getOrbTerms } from "@/redux/features/termsSlice";
+// import { AppDispatch, useAppSelector } from "@/redux/store";
 import axios from "axios";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Contract, RpcProvider, shortString } from "starknet";
 import { PinataSDK } from "pinata-web3";
+import { useOrbDetailsStore, useOrbtermsStore } from "@/zustand/Wallet";
 
-interface data{
-    oathSworn: string,
-    // terms: string,
-    privacy: string,
-    Exclusivity: string,
-    swornDate: string
-    // honoredUntil: string
+interface data {
+  oathSworn: string,
+  // terms: string,
+  privacy: string,
+  Exclusivity: string,
+  swornDate: string
+  // honoredUntil: string
 }
 
 interface OrbData {
@@ -41,17 +42,19 @@ export default function Oath() {
     pinataGateway: "https://emerald-big-beaver-890.mypinata.cloud",
   });
 
-  const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
-  const dispatch = useDispatch<AppDispatch>();
+  // const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
+  const {address} = useOrbDetailsStore()
+  const {setOrbTerms} = useOrbtermsStore()
+  // const dispatch = useDispatch<AppDispatch>();
   const [orbHashData, setOrbHashData] = useState<null | data>(null);
 
 
-//   0x1, 0x6261666b7265696878626d657571327174723279776c72706b7262337a6f6b,0x6a79736c6f773334796e7966786b677962736f73757964366a323565,
-// 0x1c,
-// 0x67296000,
-// 0x0,
-// 0x1,
-// 0x0
+  //   0x1, 0x6261666b7265696878626d657571327174723279776c72706b7262337a6f6b,0x6a79736c6f773334796e7966786b677962736f73757964366a323565,
+  // 0x1c,
+  // 0x67296000,
+  // 0x0,
+  // 0x1,
+  // 0x0
 
 
   // const longString: string[] = shortString
@@ -65,50 +68,51 @@ export default function Oath() {
   const fetchData = async () => {
     try {
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-      if (contract !== null){
+      if (address !== null) {
 
-          const { abi: testAbi } = await provider.getClassAt(contract);
+        const { abi: testAbi } = await provider.getClassAt(address);
 
-          if (testAbi === undefined) {
-            throw new Error("no abi.");
+        if (testAbi === undefined) {
+          throw new Error("no abi.");
+        }
+
+        const myContractCall = new Contract(testAbi, address, provider);
+
+        const orbHash = await myContractCall.get_oathHash();
+        const honoredUntil = await myContractCall.get_honored_until();
+        const epochTime = Number(honoredUntil)
+        const honoredDate = new Date(epochTime * 1000);
+        setHonoredUntil(honoredDate.toString());
+        console.log('hash of orb', orbHash);
+
+        if (orbHash !== "") {
+
+
+
+          const response = await pinata.gateways.get(orbHash);
+          if (response.data && typeof response.data === 'object') {
+
+            const orbData = response.data as unknown as OrbData;
+            console.log('ddddd2', response.data);
+            setOrbHashData(orbData);
+            const data = orbData.questions;
+            // dispatch(getOrbTerms({ data }));
+            setOrbTerms(data);
+            console.log('orb terms data', data);
           }
 
-      const myContractCall = new Contract(testAbi, contract, provider);
+        }
 
-      const orbHash = await myContractCall.get_oathHash();
-      const honoredUntil = await myContractCall.get_honored_until();
-      const epochTime = Number(honoredUntil)
-   const honoredDate = new Date(epochTime * 1000);
-   setHonoredUntil(honoredDate.toString());
-      console.log('hash of orb', orbHash);
 
-      if(orbHash !==""){
-        
-
-  
-  const response = await pinata.gateways.get(orbHash);
-  if (response.data && typeof response.data === 'object') {
-
-    const orbData = response.data as unknown as OrbData;
-    console.log('ddddd',response.data)
-    setOrbHashData(orbData);
-    const data = orbData.questions;
-    dispatch(getOrbTerms({data}));
-    console.log(data);
-  }
-
-      }
-      
-      
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchData()
-  });
+  },[]);
 
 
   return (
@@ -127,7 +131,7 @@ export default function Oath() {
         <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center flex">
           {orbHashData?.oathSworn}
         </p>
- 
+
         {/* //   <p className="text-center  text-[20px] font-bold leading-[26px] tracking-[0.15px] mt-8 text-[#99E515]">Orbs Terms of Service</p> <br/>
         // <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center">
         //   {orbHashData?.terms}
@@ -144,7 +148,7 @@ export default function Oath() {
 
           <div className="flex items-center">
             <p className="text-[14px] font-bold tracking-[0.46px] underline">
-             {orbHashData?.privacy}
+              {orbHashData?.privacy}
             </p>
           </div>
         </div>

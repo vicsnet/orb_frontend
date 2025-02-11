@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { Contract, RpcProvider, shortString } from "starknet";
 import { PinataSDK } from "pinata-web3";
 import { useOrbDetailsStore, useOrbtermsStore } from "@/zustand/Wallet";
+import { useQuery } from "@tanstack/react-query";
 
 interface data {
   oathSworn: string,
@@ -34,7 +35,7 @@ interface Question {
 
 export default function Oath() {
 
-  const [honoredUntil, setHonoredUntil] = useState<string>('')
+  // const [honoredUntil, setHonoredUntil] = useState<string>('')
   const JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyYTBjNjg3MS04NGIxLTRlMDgtODg2ZC1iYmU5ODY5ZDQ4OWMiLCJlbWFpbCI6InZpbmNlLmFkZXNhbm1pMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZWQ2MGI4MzZiNGI3M2Q3OGU5NmYiLCJzY29wZWRLZXlTZWNyZXQiOiI2N2FjNWNmZTBhODIzYWEyYzA1ZDA5MDNhMDRiZWQ5YjM1MzllMDVkODkxZWMwNTRiYjM2OTBkMDUyMDdjN2NhIiwiZXhwIjoxNzcwMTEyODA3fQ.5zF5vDwlY_RHXz4lkckjovm1xbFxowIbqZvDf69QD0Y";
 
   const pinata = new PinataSDK({
@@ -46,7 +47,7 @@ export default function Oath() {
   const {address} = useOrbDetailsStore()
   const {setOrbTerms} = useOrbtermsStore()
   // const dispatch = useDispatch<AppDispatch>();
-  const [orbHashData, setOrbHashData] = useState<null | data>(null);
+  // const [orbHashData, setOrbHashData] = useState<null | data>(null);
 
 
   //   0x1, 0x6261666b7265696878626d657571327174723279776c72706b7262337a6f6b,0x6a79736c6f773334796e7966786b677962736f73757964366a323565,
@@ -82,8 +83,8 @@ export default function Oath() {
         const honoredUntil = await myContractCall.get_honored_until();
         const epochTime = Number(honoredUntil)
         const honoredDate = new Date(epochTime * 1000);
-        setHonoredUntil(honoredDate.toString());
-        console.log('hash of orb', orbHash);
+        // setHonoredUntil(honoredDate.toString());
+        // console.log('hash of orb', orbHash);
 
         if (orbHash !== "") {
 
@@ -94,14 +95,17 @@ export default function Oath() {
 
             const orbData = response.data as unknown as OrbData;
             console.log('ddddd2', response.data);
-            setOrbHashData(orbData);
+            // setOrbHashData(orbData);
             const data = orbData.questions;
             // dispatch(getOrbTerms({ data }));
             setOrbTerms(data);
+
             console.log('orb terms data', data);
+            return({honoredUntil:honoredDate.toString(),orbHashData:orbData})
           }
 
         }
+        return({honoredUntil:honoredDate.toString()})
 
 
       }
@@ -109,10 +113,20 @@ export default function Oath() {
       console.error(error);
     }
   };
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ['FetchOrbHashData'],
+    queryFn: async () => {
+      const data = await fetchData()
+      return data
+    },
+  })
 
-  useEffect(() => {
-    fetchData()
-  },[]);
+  // console.log('dataorbHashData',data?.orbHashData);
+  
+
+  // useEffect(() => {
+  //   fetchData()
+  // },[]);
 
 
   return (
@@ -129,7 +143,7 @@ export default function Oath() {
         }}
       >
         <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center flex">
-          {orbHashData?.oathSworn}
+          {data?.orbHashData?.oathSworn}
         </p>
 
         {/* //   <p className="text-center  text-[20px] font-bold leading-[26px] tracking-[0.15px] mt-8 text-[#99E515]">Orbs Terms of Service</p> <br/>
@@ -148,7 +162,7 @@ export default function Oath() {
 
           <div className="flex items-center">
             <p className="text-[14px] font-bold tracking-[0.46px] underline">
-              {orbHashData?.privacy}
+              {data?.orbHashData?.privacy}
             </p>
           </div>
         </div>
@@ -160,7 +174,7 @@ export default function Oath() {
 
           <div className="flex items-center">
             <p className="text-[14px] font-bold tracking-[0.46px] underline">
-              {orbHashData?.Exclusivity}
+              {data?.orbHashData?.Exclusivity}
             </p>
           </div>
         </div>
@@ -174,7 +188,7 @@ export default function Oath() {
 
           <div className="flex items-center">
             <p className="text-[14px] font-bold tracking-[0.46px] underline">
-              {orbHashData?.swornDate}
+              {data?.orbHashData?.swornDate}
             </p>
           </div>
         </div>
@@ -188,7 +202,7 @@ export default function Oath() {
 
           <div className="flex items-center">
             <p className="text-[14px] font-bold tracking-[0.46px] underline">
-              {honoredUntil}
+              {data?.honoredUntil}
             </p>
           </div>
         </div>

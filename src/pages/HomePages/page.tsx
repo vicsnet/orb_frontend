@@ -1,4 +1,4 @@
-import RootLayout from '@/app/layout'
+// import RootLayout from '@/pages/layout'
 import HomeFeatures from '@/features/HomeFeatures/page'
 import React from 'react'
 

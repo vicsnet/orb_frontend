@@ -18,6 +18,8 @@ import {
   // StarknetWalletProvider
   
 } from "starknet";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 // import { StarknetWalletProvider } from "get-starknet"
 // import { WalletAccount } from 'starknet';
 
@@ -51,9 +53,9 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
   // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
   // const contractAddress = useAppSelector(
   //   (state) => state?.OrbDetailsReducer?.address
-  // );
-  const [invocPeriod, setInvocPeriod] = useState<any>(0);
-  const [honoredTime, setHonoredTime] = useState<any>(0);
+  // // );
+  // const [invocPeriod, setInvocPeriod] = useState<any>(0);
+  // const [honoredTime, setHonoredTime] = useState<any>(0);
 
   const fetchData = async () => {
     try {
@@ -70,11 +72,13 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
         const InvocationTime = await myContractCall.get_invocation_period();
         console.log("InvocationTime", InvocationTime);
 
-        setInvocPeriod(InvocationTime.toString());
+        // setInvocPeriod(InvocationTime.toString());
 
         const honoredUntilTime = await myContractCall.get_honored_until();
         const time = epochToTime(honoredUntilTime);
-        setHonoredTime(time);
+        // setHonoredTime(time);
+
+        return({invocPeriod:InvocationTime.toString(), honoredTime: time})
       }
     } catch (error) {
       console.error(error);
@@ -149,9 +153,30 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  },[]);
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ['FetchPurchaseData'],
+    queryFn: async () => {
+      const data = await fetchData()
+      return data
+    },
+  })
+
+  console.log('FetchPurchaseData', data);
+  
+  const mutation = useMutation({
+    mutationFn: (Purchase)=>{
+      const data = purchaseFraction()
+      return data;
+    },
+  });
+
+  if (mutation.isSuccess) {
+    // setOpenRespond(false)
+    toast.success(`tx:hash:${mutation.data}`)
+  }
+  if (mutation.error) {
+    toast.error(`${mutation.error}`)
+  }
 
   return (
     <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
@@ -202,7 +227,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
                 Term Length
               </p>
               <p className="font-bold text-[14px] tracking-[0.1px] leading-5 text-[#FFFFFF]">
-                {honoredTime}
+                {data?.honoredTime}
               </p>
             </div>
             <div className="flex justify-between">
@@ -210,7 +235,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
                 Invocation Period
               </p>
               <p className="font-bold text-[14px] tracking-[0.1px] leading-5 text-[#FFFFFF]">
-                {invocPeriod} {invocPeriod >= 2 ? "day's" : "day"}
+                {data?.invocPeriod} {data?.invocPeriod >= 2 ? "day's" : "day"}
               </p>
             </div>
             <div className="flex justify-between">
@@ -233,9 +258,9 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
           <div className="mt-6 mb-4">
             <div
               className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center"
-              onClick={purchaseFraction}
+              onClick={()=>mutation.mutate}
             >
-              Purchase
+              {mutation.isPending ? 'Purchasing ...' : 'Purchase'}
             </div>
           </div>
         </div>

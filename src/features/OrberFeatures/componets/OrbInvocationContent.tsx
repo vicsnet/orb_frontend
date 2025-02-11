@@ -10,6 +10,7 @@ import { ByteArray, byteArray, cairo, Contract, hash, num, RpcProvider, uint256,
 import RespondQuestion from './RespondQuestion';
 // import {StarknetWalletProvider} from 'get-starknet'
 import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
+import { useQuery } from '@tanstack/react-query';
 
 interface EMITTED_EVENT {
     // blockHash: string;
@@ -29,8 +30,8 @@ export default function OrbInvocationContent() {
     // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
     const { address } = useOrbDetailsStore();
 
-    const [contentData, setContentData] = useState<EMITTED_EVENT[]>([])
-    const [respData, setRespData] = useState<EMITTED_EVENT[]>([])
+    // const [contentData, setContentData] = useState<EMITTED_EVENT[]>([])
+    // const [respData, setRespData] = useState<EMITTED_EVENT[]>([])
     const [openRespond, setOpenRespond] = useState<boolean>(false)
     const [contentId, setContentId] = useState<number>(0)
 
@@ -54,7 +55,7 @@ export default function OrbInvocationContent() {
         // const uint256Value: Uint256 = { low: eventsList.events[0].data[0], high: eventsList.events[0].data[1] };
         // const result = uint256.uint256ToBN(uint256Value);
 
-        console.log('invocList', eventsList.events);
+        // console.log('invocList', eventsList.events);
 
 
 
@@ -63,10 +64,10 @@ export default function OrbInvocationContent() {
 
         const recentDate = epochToTime(Number(date).toString())
 
-        console.log('result2..', recentDate);
+        // console.log('result2..', recentDate);
 
         const address2 = eventsList.events[1].data[2]
-        console.log('address', address2);
+        // console.log('address', address2);
 
         // const invocIdUint256: Uint256 = { low: eventsList.events[1].data[0], high: eventsList.events[1].data[1], }
 
@@ -82,8 +83,8 @@ export default function OrbInvocationContent() {
             return match;
         });
 
-        console.log('filteredDataaaa', filteredData);
-        setContentData(filteredData)
+        // console.log('filteredDataaaa', filteredData);
+        // setContentData(filteredData)
 
         const ResponseFilter = [[num.toHex(hash.starknetKeccak('Response')), '0x8'],];
 
@@ -95,7 +96,7 @@ export default function OrbInvocationContent() {
             chunk_size: 10,
         });
 
-        console.log('ResponseListEvent', ResponseList.events);
+        // console.log('ResponseListEvent', ResponseList.events);
 
         const responseData = ResponseList.events
 
@@ -112,8 +113,10 @@ export default function OrbInvocationContent() {
             return match;
         });
 
-        setRespData(filterResponse);
-        console.log('filterResponse', filterResponse);
+        // setRespData(filterResponse);
+
+        return ({contentData:filteredData, respData:filterResponse})
+        // console.log('filterResponse', filterResponse);
 
 
 
@@ -238,15 +241,25 @@ export default function OrbInvocationContent() {
 
     }
 
-    useEffect(() => {
-        getInvocation()
-    }, [])
+    const { isPending, isError, data, error } = useQuery({
+        queryKey: ['FetchInvocation'],
+        queryFn: async () => {
+          const data = await getInvocation()
+          return data
+        },
+      })
+
+      console.log('invocation data', data);
+      
+    // useEffect(() => {
+    //     getInvocation()
+    // }, [])
 
     return (
         <div className="relative">
 
             <div className='w-[40%]'>
-                {contentData.map((content, index) => {
+                {data?.contentData.map((content, index) => {
                     if (content) {
                         const myByteArray = {
                             data: [content.data[6]],
@@ -290,7 +303,7 @@ export default function OrbInvocationContent() {
                                 </div>
 
 
-                                {respData.map((resp, respIndex) => {
+                                {data?.respData.map((resp, respIndex) => {
                                     let result22: String;
 
                                     const hash = resp.transaction_hash;

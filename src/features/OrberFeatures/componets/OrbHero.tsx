@@ -1,14 +1,12 @@
 "use client";
 import { ProviderUrl } from "@/constant/contract";
-// import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { cairo, Contract, RpcProvider, shortString, WalletAccount } from "starknet";
 import { currentDate, epochToTime } from "@/constant/constant";
 import { LuDot } from "react-icons/lu";
-import { useDispatch } from "react-redux";
-// import { getOrbPrice } from "@/redux/features/priceSlice";
-import {useOrbDetailsStore, useOrbprice, useWalletStore} from "@/zustand/Wallet"
+import { useOrbDetailsStore, useOrbprice, useWalletStore } from "@/zustand/Wallet"
+import { useQuery } from "@tanstack/react-query";
 
 
 type OrbHeroProps = {
@@ -22,19 +20,11 @@ type OrbHeroProps = {
 
 export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays }: OrbHeroProps) {
 
-  const {setOrbPrice, price} = useOrbprice()
-  const {starknetAccount} =useWalletStore()
-  // const description = useAppSelector(
-  //   (state) => state?.OrbDetailsReducer?.OrbAccountDetails?.description
-  // );
-  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
+  const { setOrbPrice, price } = useOrbprice()
+  const { starknetAccount } = useWalletStore()
 
-  const {address, description} = useOrbDetailsStore()
+  const { address, description } = useOrbDetailsStore()
 
-  // const starknetAccount2 = useAppSelector(
-  //   (state) => state?.walletReducer?.starknetAccount
-  // );
-  // const dispatch = useDispatch();
   const [myOrbprice, setMyOrbPrice] = useState<any>(0);
   const [orbStatus, setOrbStatus] = useState<boolean>(false);
   const [totalFracOrb, setTotalFracOrb] = useState<any>(0);
@@ -50,7 +40,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
 
       if (address !== null) {
         console.log('contract', address);
-        
+
         const { abi: testAbi } = await provider.getClassAt(address);
 
         if (testAbi === undefined) {
@@ -60,27 +50,24 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         const myContractCall = new Contract(testAbi, address, provider);
 
         const priceHash = await myContractCall.get_orb_price();
+        // setMyOrbPrice(priceHash.toString());
 
-        const oathHash = await myContractCall.get_oathHash();
-        setOathHash(oathHash);
-        // console.log('oathhh', oathHash);
-
-       
-        setMyOrbPrice(priceHash.toString());
-        // remove dispatch
-        // dispatch(getOrbPrice({ price: priceHash.toString() }));
         setOrbPrice(priceHash.toString());
 
+        const oathHash = await myContractCall.get_oathHash();
+        // setOathHash(oathHash);
+
+
         const orbStatus = await myContractCall.get_orb_status();
-        setOrbStatus(orbStatus);
+        // setOrbStatus(orbStatus);
 
         const orbEndTime = await myContractCall.get_honored_until();
         const epochTimeConversion = epochToTime(orbEndTime.toString());
-        setOrbEndDate(epochTimeConversion);
+        // setOrbEndDate(epochTimeConversion);
 
         const totalOrb = await myContractCall.get_total_supply();
-        console.log('totalOrb', totalOrb);
-        
+        // console.log('totalOrb', totalOrb);
+
         setTotalFracOrb(totalOrb.toString());
         const totalAddressFrac = await myContractCall.my_fractioned_balance(
           address
@@ -91,8 +78,11 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
           const myFracBalance = await myContractCall.my_fractioned_balance(
             buyerAddress
           );
-          setOrbToken(myFracBalance);
+          // setOrbToken(myFracBalance);
+
+          return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(),  orbToken: myFracBalance })
         }
+        return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(), orbToken: 0 })
       }
     } catch (error) {
       console.error(error);
@@ -140,11 +130,22 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     }
   }
 
-  useEffect(() => {
-    fetchData();
-    // console.log('orbToken', orbToken);
+  const { isPending, isError, data, error, isFetching } = useQuery({
+    queryKey: ['FetchHeroData'],
+    queryFn: async () => {
+      const data = await fetchData()
+      return data
+    },
+  })
 
-  },[]);
+  console.log('daraaa', data);
+  console.log('daraaa3', data?.orbToken);
+
+  // useEffect(() => {
+  //   fetchData();
+  //   // console.log('orbToken', orbToken);
+
+  // }, []);
   return (
     <section className="w-[90%] mx-auto mt-[180px] relative">
       <div
@@ -158,9 +159,14 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         <div className="">
           {/* status */}
           <h2 className="text-[20px] font-bold leading-[26px] tracking-[0.15px] capitalize text-white text-center pt-[16px]">
-            {orbStatus && orbEndDate > currentDate() && "ORB IS LIVE"}
-            {orbStatus && orbEndDate < currentDate() && "ORB HAS ENDED"}
-            {!orbStatus && "ORB NOT STARTED"}
+           
+            
+                {data?.orbStatus && data?.orbEndDate > currentDate() && "ORB IS LIVE"}
+
+                {data?.orbStatus && data?.orbEndDate < currentDate() && "ORB HAS ENDED"}
+                {!data?.orbStatus && "ORB NOT STARTED"}
+            
+            
           </h2>
 
           {/* PRICE */}
@@ -176,23 +182,29 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               Orb Price
             </h2>
             <p className="text-white font-bold leading-[32.016px] text-center">
-              {Number(myOrbprice) / decimal} Strk
+            
+                {Number(data?.myOrbprice) / decimal} Strk
+           
             </p>
           </div>
 
           <div className=" w-[90%] mx-auto flex justify-center flex-col">
             <p className="font-bold text-[20px] leading-[26px] tracking-[0.15px] text-center">
-              {orbStatus && orbEndDate > currentDate() && description}
-              {orbStatus &&
-                orbEndDate < currentDate() &&
+             
+              {data?.orbStatus && data?.orbEndDate > currentDate() && description}
+              {data?.orbStatus &&
+                data?.orbEndDate < currentDate() &&
                 "And now his watch has ended. Orb is over, and no further activity will happen. Thank you to everyone who participated."}
+            
             </p>
           </div>
           {/* for non orb user */}
           <div className="w-[90%] mx-auto mt-5">
             <div className="bg-[#636669BF] rounded-full flex w-[35%] ">
               <p className="font-bold text-white text-[16px] leading-5  py-[4px] text-center px-[20px]">
-                {AddressFrac}/{totalFracOrb} available
+                
+                {Number(data?.AddressFrac)}/{Number(data?.totalFracOrb)} available
+               
               </p>
             </div>
           </div>
@@ -204,7 +216,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             </p>
           </div>
           <div className="flex justify-center gap-2 ">
-            {oathHash === "" && (
+         
+            {data?.oathHash === "" && (
               <button
                 className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenOath(true)}
@@ -212,6 +225,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
                 Swear Oath
               </button>
             )}
+           
 
             {cooldownDays === 0 && <button
               className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
@@ -219,7 +233,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             >
               Set Cooldown Period
             </button>}
-            {Number(price) === 0  || Number(price) === null &&
+
+            {Number(price) === 0 || Number(price) === null &&
               <button
                 className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenPrice(true)}
@@ -227,8 +242,10 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
                 Set Price
               </button>
             }
+           
+            
             {
-              !orbStatus &&
+              !data?.orbStatus &&
               <button
                 className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
                 onClick={() => startMyOrb()}
@@ -236,10 +253,12 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
                 Start Orb
               </button>
             }
+              
           </div>
-          {orbToken === 0 && (
+         
+          {Number(data?.orbToken) === 0 && (
             <div className="flex justify-center">
-              {orbStatus && (
+              {data?.orbStatus && (
                 <button
                   className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
                   onClick={() => setOpenPurchase(true)}
@@ -250,7 +269,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             </div>
           )}
 
-          {orbToken > 0 && (
+          {Number(data?.orbToken) === 1 && (
             <>
               {/* if purchased */}
 
@@ -278,6 +297,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               </div>
             </>
           )}
+         
         </div>
         {/* orb status */}
       </div>

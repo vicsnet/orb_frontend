@@ -1,8 +1,10 @@
 import { orbInvocRegistryCA } from '@/constant/contract';
 // import { useAppSelector } from '@/redux/store';
 import { useOrbDetailsStore, useWalletStore } from '@/zustand/Wallet';
+import { useMutation } from '@tanstack/react-query';
 import React, { useState } from 'react'
 import { MdClose } from 'react-icons/md'
+import { toast } from 'react-toastify';
 import { byteArray, cairo, CallData, Contract, RpcProvider, WalletAccount } from 'starknet';
 
 // import {StarknetWalletProvider }from 'get-starknet'
@@ -66,6 +68,8 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
           const resToken = await myWalletAccount.execute(myInvokeCall);
           await provider.waitForTransaction(resToken.transaction_hash);
           console.log("resToken", resToken.transaction_hash);
+
+          return resToken.transaction_hash
         }
       }
 
@@ -74,10 +78,29 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
 
     } catch (error) {
       console.error(error);
+      return error
     }
 
 
   }
+
+  const mutation = useMutation({
+    mutationFn: (AskQuestion)=>{
+      const data = invokeOrb()
+      return data;
+    }, 
+  });
+
+  if(mutation.isSuccess){
+    toast.success(`tx:hash:${mutation.data}`)
+  }
+  if(mutation.error){
+  toast.error(`${mutation.error}`)
+}
+
+
+
+
   return (
     <main className='w-[100%] h-screen absolute top-0 backdrop-opacity-5'>
       <section className="w-[30%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px]">
@@ -105,12 +128,16 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
 
           <div className="mt-6 mb-4">
             <div
-              className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center"
-              onClick={invokeOrb}
+              className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center cursor-pointer"
+              onClick={()=>mutation.mutate()}
             >
-              Invoke
+              {mutation.isPending ? 'Invoking ....' : 'Invoke'}
+              
             </div>
           </div>
+          <>
+         
+          </>
         </div>
       </section>
     </main>

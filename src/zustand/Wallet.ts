@@ -1,5 +1,6 @@
 import { StarknetWindowObject } from 'get-starknet'
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 
 

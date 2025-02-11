@@ -1,5 +1,6 @@
 // import { useAppSelector } from '@/redux/store'
 import { useOrbDetailsStore } from '@/zustand/Wallet';
+import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 import { num, RpcProvider, hash, Uint256, uint256 } from 'starknet';
@@ -14,7 +15,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
     // const orbDetail = useAppSelector((state) => state?.OrbDetailsReducer?.OrbAccountDetails)
     // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
 
-    const [cooldown, setCooldown] = useState<number>(0)
+    // const [cooldown, setCooldown] = useState<number>(0)
 
 
     const getCoolDown = async () => {
@@ -36,15 +37,27 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
 
         const uint256Value: Uint256 = { low: eventsList.events[0].data[0], high: eventsList.events[0].data[1] };
         const result = uint256.uint256ToBN(uint256Value);
-        setCooldown(Number(result));
+        // setCooldown(Number(result));
         setCooldownDays(Number(result))
-        // console.log('eventList2',result);
+        
+        return ({cooldown:Number(result)})
 
     }
 
-    useEffect(() => {
-        getCoolDown()
-    }, [])
+    const { isPending, isError, data, error } = useQuery({
+        queryKey: ['FetchAllAdresses'],
+        queryFn: async () => {
+          const data = await getCoolDown()
+          return data
+        },
+      })
+console.log('dataCooldown',data?.cooldown);
+
+
+    // useEffect(() => {
+    //     getCoolDown()
+    // }, [])
+    
     return (
         <section className='w-[90%] mx-auto'>
             <div className="w-[40%]">
@@ -80,7 +93,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                         <p className="">........................................................................................</p>
 
                         <div className="flex items-center">
-                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{cooldown} Days</p>
+                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{data?.cooldown} Days</p>
 
                         </div>
                     </div>

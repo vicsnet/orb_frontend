@@ -7,21 +7,14 @@ import orbPond from "@/constant/orbPond.json";
 import { getAddress } from "@ethersproject/address";
 import { orbPondCA, ProviderUrl } from "@/constant/contract";
 import { Contract, hash, num, RpcProvider } from "starknet";
-// import { useAppSelector } from "@/redux/store";
-// import {
-//   ApolloClient,
-//   ApolloProvider,
-//   InMemoryCache,
-//   HttpLink,
-//   gql,
-//   useQuery,
-// } from "@apollo/client";
+import { useQuery } from "@tanstack/react-query";
+
 
 
 
 export default function CreatorsContent() {
   // const provider = useAppSelector((state)=> state.walletReducer.starknetAccount?.provider);
-  const [orbAddresses, setOrbAddresses] = useState<null | []>(null);
+  // const [orbAddresses, setOrbAddresses] = useState<null | []>(null);
 
   const fetchData = async () => {
     try {
@@ -36,8 +29,9 @@ export default function CreatorsContent() {
       const myContractCall = new Contract(testAbi, orbPondCA, provider);
 
       const orbAddresses = await myContractCall.get_all_orb_addresses();
-      setOrbAddresses(orbAddresses);
+      // setOrbAddresses(orbAddresses);
       // console.log("All orbAddresses",orbAddresses)
+      return orbAddresses
 
 
     } catch (error) {
@@ -45,10 +39,23 @@ export default function CreatorsContent() {
     }
   };
 
-  useEffect(() => {
-    fetchData(); 
+
+  const { isPending, isLoading, isError, data:orbAddresses, error } = useQuery({
+    queryKey: ['FetchAllAdresses'],
+    queryFn: async () => {
+      const data = await fetchData()
+      return data
+    },
+  })
+
+  const safeOrbAddresses = Array.isArray(orbAddresses) ? orbAddresses : [];
+
+
+
+  // useEffect(() => {
+  //   fetchData(); 
     
-  },[]);
+  // },[]);
 
   return (
     <section className="mt-[96px]">
@@ -63,15 +70,17 @@ export default function CreatorsContent() {
       </div>
 
       <div className="w-[90%] mx-auto mt-9">
+        {
+          isLoading ? 
+          <p className="text-[white]">Loading...</p> 
+          :
         <div className="flex gap-4 flex-wrap">
           {
-            orbAddresses !== null &&
+            safeOrbAddresses.length > 0 &&
             <>
-          {orbAddresses?.map((data, index) => 
+          {safeOrbAddresses?.map((data:string, index:number) => 
         
-          {
-            // console.log('orb data', data);
-            
+          {            
           return(
             
             <div key={index} className="" >
@@ -87,6 +96,7 @@ export default function CreatorsContent() {
             </>
           }
         </div>
+        }
       </div>
     </section>
   );

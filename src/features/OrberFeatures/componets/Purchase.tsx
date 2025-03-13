@@ -6,7 +6,7 @@ import { connect, StarknetWindowObject } from "get-starknet";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
-import {useWalletStore, useOrbprice, useOrbDetailsStore} from "@/zustand/Wallet"
+import { useWalletStore, useOrbprice, useOrbDetailsStore } from "@/zustand/Wallet"
 
 import {
   Contract,
@@ -16,7 +16,7 @@ import {
   WalletAccount,
   cairo,
   // StarknetWalletProvider
-  
+
 } from "starknet";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -28,20 +28,20 @@ type OrbHeroProps = {
   setOpenPurchase: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
-  const {starknetAccount} = useWalletStore()
-  const {price} = useOrbprice()
+  const { starknetAccount } = useWalletStore()
+  const { price } = useOrbprice()
 
   // const data = useAppSelector(
   //   (state) => state?.OrbDetailsReducer?.OrbAccountDetails
   // );
 
-        const { name,
-            description,
-            image,
-            creator,
-            x_account,
-            farcaster,
-            address } = useOrbDetailsStore();
+  const { name,
+    description,
+    image,
+    creator,
+    x_account,
+    farcaster,
+    address } = useOrbDetailsStore();
   // const starknetAccount2 = useAppSelector(
   //   (state) => state?.walletReducer?.starknetAccount
   // );
@@ -78,7 +78,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
         const time = epochToTime(honoredUntilTime);
         // setHonoredTime(time);
 
-        return({invocPeriod:InvocationTime.toString(), honoredTime: time})
+        return ({ invocPeriod: InvocationTime.toString(), honoredTime: time })
       }
     } catch (error) {
       console.error(error);
@@ -95,21 +95,21 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
         const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
         const buyerAddress = starknetAccount?.account.address;
         // console.log();
-        
+
         const { abi: testAbi } = await provider.getClassAt(address);
         const { abi: tokenAbi } = await provider.getClassAt(tokenAddress);
 
         const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
         // const signer = starknetAccount?.account.signer;
-        if (starknetAccount !== null){
+        if (starknetAccount !== null) {
 
           const myWalletAccount = new WalletAccount(
             { nodeUrl: myFrontendProviderUrl },
             starknetAccount as any
           );
-  
+
           console.log(myWalletAccount, `myWalletAccount`);
-          
+
           if (address !== null && starknetAccount !== null) {
             const contractCall = new Contract(
               testAbi,
@@ -126,21 +126,21 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
               address,
               cairo.uint256(Number(price)),
             ]);
-  
+
             const resToken = await myWalletAccount.execute(myTokenCall);
             await provider.waitForTransaction(resToken.transaction_hash);
             console.log("resToken", resToken.transaction_hash);
-  
+
             if (resToken) {
               contractCall.connect(myWalletAccount);
-  
+
               const myCall = contractCall.populate("buy_orb", [
                 buyerAddress,
                 cairo.uint256(Number(price)),
                 tokenAddress,
                 cairo.uint256(Number(1)),
               ]);
-  
+
               const res = await myWalletAccount.execute(myCall);
               await provider.waitForTransaction(res.transaction_hash);
               console.log(res.transaction_hash);
@@ -162,9 +162,9 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
   })
 
   console.log('FetchPurchaseData', data);
-  
+
   const mutation = useMutation({
-    mutationFn: (Purchase)=>{
+    mutationFn: (Purchase) => {
       const data = purchaseFraction()
       return data;
     },
@@ -258,7 +258,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
           <div className="mt-6 mb-4">
             <div
               className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center"
-              onClick={()=>mutation.mutate}
+              onClick={() => mutation.mutate}
             >
               {mutation.isPending ? 'Purchasing ...' : 'Purchase'}
             </div>

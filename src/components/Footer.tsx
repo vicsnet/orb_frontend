@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import React from 'react'
 
 type OrbFooterProps = {
-  setOpenCreateOrb: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpenCreateOrb?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function Footer({ setOpenCreateOrb }: OrbFooterProps) {
@@ -40,7 +40,7 @@ export default function Footer({ setOpenCreateOrb }: OrbFooterProps) {
               <div className=" flex justify-center items-center gap-4 mt-[40px]">
 
                 {/*  */}
-                <button className='bg-[#99E515] rounded-[6px] text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#121312] text-center px-[16px] py-[8px]' onClick={() => setOpenCreateOrb(true)}> Create Orb </button>
+                <button className='bg-[#99E515] rounded-[6px] text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#121312] text-center px-[16px] py-[8px]' onClick={() => setOpenCreateOrb && setOpenCreateOrb(true)}> Create Orb </button>
                 <button className='flex gap-2 items-center'>
                   <p className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#99E515]">
 

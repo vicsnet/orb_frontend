@@ -174,7 +174,9 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                     uploadDataToContract(firstHalf, secondHalf);
                 }
             }
+            toast.success('Orb Created Successfully');
             setIsLoading(false);
+            setOpenCreateOrb(false);
 
         } catch (error) {
             console.error('error', error);

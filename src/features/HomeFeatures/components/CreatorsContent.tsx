@@ -60,10 +60,10 @@ export default function CreatorsContent() {
   return (
     <section className="mt-[96px]">
       <div className="">
-        <h2 className="text-[44px] text-[#FFFFFF] font-bold leading-[52.8px] -tracking-[0.5px] text-center">
+        <h2 className="text-[44px] text-[#FFFFFF] font-bold leading-[52.8px] -tracking-[0.5px] text-center smDesktop:text-[40px] smDesktop:leading-[50px] mobile:text-[24px] mobile:leading-[36px] mobile:w-[90%]mobile:mx-auto">
           Creators Around the Globe Trust Us
         </h2>
-        <p className="w-[52%] text-center mx-auto text-[16px] font-bold leading-6 tracking-[0.15px] text-[#FFFFFF] mt-1">
+        <p className="w-[52%] text-center mx-auto text-[16px] font-bold leading-6 tracking-[0.15px] text-[#FFFFFF] mt-1 mobile:w-[90%] mobile:text-[14px] mobile:leading-[20px]">
           From artists to writers, podcasters, and more, countless creators are
           thriving with Orbspace
         </p>
@@ -74,7 +74,7 @@ export default function CreatorsContent() {
           isLoading ? 
           <p className="text-[white]">Loading...</p> 
           :
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-9 lgDesktop:gap-6 smDesktop:gap-3 smDesk:gap-6 tabletAir:gap-6 flex-wrap mobile:flex-col mobile:justify-center mobile:items-center">
           {
             safeOrbAddresses.length > 0 &&
             <>
@@ -87,9 +87,6 @@ export default function CreatorsContent() {
 
               <SingleCreator
               address={data}
-                // image={props.image}
-                // orber={props.orber}
-                // creator={props.creator}
               />
             </div>
           )})}

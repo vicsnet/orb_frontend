@@ -6,7 +6,7 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { cairo, Contract, RpcProvider, shortString } from 'starknet';
-import {useOrbDetailsStore} from '@/zustand/Wallet'
+import { useOrbDetailsStore } from '@/zustand/Wallet'
 import { useQuery } from '@tanstack/react-query';
 
 interface CreatorProps {
@@ -28,7 +28,7 @@ export default function SingleCreator(props: CreatorProps) {
   // const [data, setData] = useState<Data | null>(null);
   const [address, setAddress] = useState<string>("");
   // const [loading, setLoading] = useState<boolean>(false);
-  const {setOrbDetailsData} = useOrbDetailsStore()
+  const { setOrbDetailsData } = useOrbDetailsStore()
 
 
   const fetchData = async () => {
@@ -94,16 +94,16 @@ export default function SingleCreator(props: CreatorProps) {
   // }
   const isClient = typeof window !== 'undefined';
 
-  const { isPending, isError, data, error, isLoading:loading } = useQuery({
+  const { isPending, isError, data, error, isLoading: loading } = useQuery({
     queryKey: ['FetchSingleCreatorData', props.address.toString()],
     queryFn: fetchData,
     enabled: isClient && !!props.address
-      // return data
+    // return data
     // },
   });
 
   // console.log('hello', data);
-  
+
 
   // useEffect(() => {
   //   if (props.address)
@@ -111,19 +111,30 @@ export default function SingleCreator(props: CreatorProps) {
   // }, [props.address])
 
   return (
-    <div className=' px-auto flex max-w-[368px] min-w-[300px] h-[160px] rounded-2xl gap-4 border-[1px] border-[#303033] p-[9px]' style={{ background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.12) 100%)', boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.10)' }}>
+    <div className=' px-auto flex items-center w-[400px] lgDesktop:w-[368px] smDesktop:w-[296px] smDesk:w-[394px] tabletAir:w-[350px] tablet:w-[331px] mobile:w-[335px] smMobile:w-[300px] h-[200px] rounded-2xl gap-4 border-[1px] border-[#303033] p-[9px]' style={{ background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.12) 100%)', boxShadow: '0px 4px 20px 0px rgba(0, 0, 0, 0.10)' }}>
       <div className="">
-        <Image alt={"vince"} src={!loading && data?.image ? data.image : '/images/hero.png'} width={140} height={140} className='rounded-[8px] ' />
+        <Image
+          alt={"vince"}
+          src={!loading && data?.image ?
+            data.image.startsWith('http') ? data.image : `/images/hero.png`
+            : '/images/hero.png'
+          }
+          width={150}
+          height={150}
+          className='rounded-[8px] w-[150px] h-[150px] object-cover items-center justify-center'
+        />
+
       </div>
       <div className="text-[#FFFFFF] flex flex-col gap-2">
         <h2 className="text-[24px] font-bold leading-[32.016px]">{!loading && data?.name}&#39;s Orb</h2>
         <p className="text-[14px] font-bold tracking-[0.1px]">[@{!loading && data?.x_account}]</p>
         <p className="text-[14px] font-bold tracking-[0.1px]">created by {!loading && data?.creator}</p>
-        <button onClick={() => { data &&  
-          // dispatch(getOrbData({ data, account: address })) 
-          setOrbDetailsData(data.name, data.description, data.image, data.creator, data.x_account, data.farcater, address)
-          
-          }} className='bg-[#99E515] mt-3 text-[14px] font-bold leading-[24px] tracking-[0.4px] text-center w-[156px] h-[32px] rounded-[6px] text-[#121312]'>
+        <button onClick={() => {
+          data &&
+         
+            setOrbDetailsData(data.name, data.description, data.image, data.creator, data.x_account, data.farcater, address)
+
+        }} className='bg-[#99E515] mt-3 text-[14px] font-bold leading-[24px] tracking-[0.4px] text-center w-[156px] h-[32px] rounded-[6px] text-[#121312]'>
           <Link href={{
             pathname: `/${address}`,
             query: { orb: `${data?.name}` },

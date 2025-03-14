@@ -60,19 +60,20 @@ console.log('dataCooldown',data?.cooldown);
     
     return (
         <section className='w-[90%] mx-auto'>
-            <div className="w-[40%]">
-                <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.50px] text-[#FFFFFF] mt-[160px]">
+            <div className="w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%]">
+                <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.50px] text-[#FFFFFF] mt-[140px] tabletAir:mt-[100px] mobile:mt-[70px] mobile:text-[24px]">
                     About the Orb
                 </h2>
 
-                <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mt-[20px]">
+                <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px] mt-[20px] text-justify">
                     Up until now, much of the NFT space has concerned itself primarily with art, pictures, jpegs and galleries. Orbs are different. Orbs are usable 1-of-1 NFTs that belong in inventories, not in galleries. They are for usage, not display. Conceptually, an Orb is a precious item that belongs in your magic item bag. Technically, the Orb is a modified ERC-721 on Ethereum that manages ownership functions through auctions and fractional ownership.
                 </p>
 
                 <div className="flex flex-col gap-4 mt-[40px]">
                     <div className="flex items-center gap-4">
-                        <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">Created by</h2>
-                        <p className="">..................................................................................</p>
+                        <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">Created by</h2>
+                        <p className="mobile:hidden">..................................................................................</p>
+                        <p className="hidden mobile:block">.............................</p>
 
                         <div className="flex items-center">
                             <p className="text-[14px] font-bold tracking-[0.46px] underline">{name}</p>
@@ -80,8 +81,9 @@ console.log('dataCooldown',data?.cooldown);
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">Contract</h2>
-                        <p className="">.................................................................................</p>
+                        <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">Contract</h2>
+                        <p className="mobile:hidden">.................................................................................</p>
+                        <p className="hidden mobile:block">....................................</p>
 
                         <div className="flex items-center">
                             <p className="text-[14px] font-bold tracking-[0.46px] underline">{`${address?.slice(0, 5)}..${address?.slice(-3)}`}</p>
@@ -89,8 +91,9 @@ console.log('dataCooldown',data?.cooldown);
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">Cooldown</h2>
-                        <p className="">........................................................................................</p>
+                        <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">Cooldown</h2>
+                        <p className="mobile:hidden">........................................................................................</p>
+                        <p className="hidden mobile:block">.............................................</p>
 
                         <div className="flex items-center">
                             <p className="text-[14px] font-bold tracking-[0.46px] underline">{data?.cooldown} Days</p>

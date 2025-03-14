@@ -20,6 +20,7 @@ import {
 } from "starknet";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import Loading from "@/components/Loading";
 // import { StarknetWalletProvider } from "get-starknet"
 // import { WalletAccount } from 'starknet';
 
@@ -30,7 +31,7 @@ type OrbHeroProps = {
 export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
   const { starknetAccount } = useWalletStore()
   const { price } = useOrbprice()
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   // const data = useAppSelector(
   //   (state) => state?.OrbDetailsReducer?.OrbAccountDetails
   // );
@@ -42,20 +43,10 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
     x_account,
     farcaster,
     address } = useOrbDetailsStore();
-  // const starknetAccount2 = useAppSelector(
-  //   (state) => state?.walletReducer?.starknetAccount
-  // );
 
-  // const price = useAppSelector((state) => state?.PriceDataReducer?.price);
-  // const price:number = Number(633333333333333336)
   console.log("pricee", price);
 
-  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
-  // const contractAddress = useAppSelector(
-  //   (state) => state?.OrbDetailsReducer?.address
-  // // );
-  // const [invocPeriod, setInvocPeriod] = useState<any>(0);
-  // const [honoredTime, setHonoredTime] = useState<any>(0);
+  
 
   const fetchData = async () => {
     try {
@@ -86,6 +77,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
   };
 
   const purchaseFraction = async () => {
+    setIsLoading(true);
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
     try {
@@ -144,12 +136,17 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
               const res = await myWalletAccount.execute(myCall);
               await provider.waitForTransaction(res.transaction_hash);
               console.log(res.transaction_hash);
+              toast.success('Purchase successful');
+              setIsLoading(false);
+              setOpenPurchase(false);
             }
           }
         }
       }
     } catch (error) {
       console.error(error);
+      toast.error('Purchase failed');
+      setIsLoading(false);
     }
   };
 
@@ -163,24 +160,24 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
 
   console.log('FetchPurchaseData', data);
 
-  const mutation = useMutation({
-    mutationFn: (Purchase) => {
-      const data = purchaseFraction()
-      return data;
-    },
-  });
+  // const mutation = useMutation({
+  //   mutationFn: (Purchase) => {
+  //     const data = purchaseFraction()
+  //     return data;
+  //   },
+  // });
 
-  if (mutation.isSuccess) {
-    // setOpenRespond(false)
-    toast.success(`tx:hash:${mutation.data}`)
-  }
-  if (mutation.error) {
-    toast.error(`${mutation.error}`)
-  }
+  // if (mutation.isSuccess) {
+  //   // setOpenRespond(false)
+  //   toast.success(`tx:hash:${mutation.data}`)
+  // }
+  // if (mutation.error) {
+  //   toast.error(`${mutation.error}`)
+  // }
 
   return (
-    <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
-      <section className="w-[30%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px]">
+    <main className="w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar">
+      <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[50%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%]  mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px] lgDesktop:mt-[150px] smDesktop:mt-[100px] smDesk:mt-[50px] tabletAir:mt-[140px] mobile:mt-[50px]">
         <div className=" mx-auto w-[90%] pt-4 pb-4">
           <div className="flex justify-between">
             <h2 className="text-[20px] leading-8 text-[#FFFFFF]">
@@ -203,16 +200,16 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
                 height={80}
               />
               <div className="">
-                <p className="text-[16px] font-bold leading-5 tracking-[0.1px] text-[#FFFFFF]">
+                <p className="text-[16px] font-bold leading-5 tracking-[0.1px] text-[#FFFFFF] mobile:text-[14px]">
                   {name}&apos;s Orb
                 </p>
-                <p className="text-[14px]">
+                <p className="text-[14px] ">
                   Created by {creator} @{x_account}
                 </p>
               </div>
             </div>
             <div className="border-l-[1px] border-l-[#040404] pl-4">
-              <p className="font-normal text-[14px] leading-5 text-[#FFFFFF]">
+              <p className="font-normal text-[14px] leading-5 text-[#FFFFFF] ">
                 Orb Price
               </p>
               <p className="font-bold text-[#FFFFFF]">
@@ -258,13 +255,15 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
           <div className="mt-6 mb-4">
             <div
               className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center"
-              onClick={() => mutation.mutate}
+              onClick={() => purchaseFraction()}
             >
-              {mutation.isPending ? 'Purchasing ...' : 'Purchase'}
+              Purchase
+             
             </div>
           </div>
         </div>
       </section>
+      {isLoading && <Loading   />}
     </main>
   );
 }

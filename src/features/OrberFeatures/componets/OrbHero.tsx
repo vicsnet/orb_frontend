@@ -7,6 +7,8 @@ import { currentDate, epochToTime } from "@/constant/constant";
 import { LuDot } from "react-icons/lu";
 import { useOrbDetailsStore, useOrbprice, useWalletStore } from "@/zustand/Wallet"
 import { useQuery } from "@tanstack/react-query";
+import Loading from "@/components/Loading";
+import { toast } from "react-toastify";
 
 
 type OrbHeroProps = {
@@ -15,10 +17,11 @@ type OrbHeroProps = {
   setOpenOath: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenCooldown: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenPrice: React.Dispatch<React.SetStateAction<boolean>>;
-  cooldownDays: number
+  cooldownDays: number;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays }: OrbHeroProps) {
+export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays, setIsLoading }: OrbHeroProps) {
 
   const { setOrbPrice, price } = useOrbprice()
   const { starknetAccount } = useWalletStore()
@@ -90,6 +93,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
   };
 
   const startMyOrb = async () => {
+    setIsLoading(true);
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
@@ -122,11 +126,14 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
           await provider.waitForTransaction(res.transaction_hash);
           console.log(res.transaction_hash);
         }
+        toast.success('Orb started successfully');
+        setIsLoading(false);
       }
 
 
     } catch (error) {
       console.error(error);
+      setIsLoading(false);
     }
   }
 
@@ -147,9 +154,9 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
 
   // }, []);
   return (
-    <section className="w-[90%] mx-auto mt-[180px] relative">
+    <section className="w-[96%] mx-auto mt-[100px] mobile:mt-[50px] relative">
       <div
-        className="w-[30%] border-[1px] rounded-[24px] "
+        className="w-[35%] lgDesktop:w-[40%] smDesktop:w-[50%] smDesk:w-[60%] mobile:w-[100%] border-[1px] rounded-[24px] "
         style={{
           background:
             "linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)",
@@ -199,9 +206,9 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             </p>
           </div>
           {/* for non orb user */}
-          <div className="w-[90%] mx-auto mt-5">
-            <div className="bg-[#636669BF] rounded-full flex w-[35%] ">
-              <p className="font-bold text-white text-[16px] leading-5  py-[4px] text-center px-[20px]">
+          <div className="w-[65%] mx-auto mt-5">
+            <div className="bg-[#636669BF] rounded-full flex w-[35%] lgDesktop:w-[43%] tabletAir:w-[45%] mobile:w-[60%] ">
+              <p className="font-bold text-white text-[16px] leading-5  py-[6px] text-center px-[20px]">
                 
                 {Number(data?.AddressFrac)}/{Number(data?.totalFracOrb)} available
                
@@ -215,28 +222,31 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               Active
             </p>
           </div>
-          <div className="flex justify-center gap-2 ">
+          {/* for admin swear oath */}
+          <div className="flex justify-center items-center w-[90%] mx-auto gap-4 ">
          
             {data?.oathHash === "" && (
               <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenOath(true)}
               >
                 Swear Oath
               </button>
             )}
            
+           {/* set cooldown period */}
 
             {cooldownDays === 0 && <button
-              className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+              className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
               onClick={() => setOpenCooldown(true)}
             >
               Set Cooldown Period
             </button>}
 
-            {Number(price) === 0 || Number(price) === null &&
+            {/* set price */}
+            {Number(price) === 0 &&
               <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenPrice(true)}
               >
                 Set Price
@@ -247,7 +257,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             {
               !data?.orbStatus &&
               <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                 onClick={() => startMyOrb()}
               >
                 Start Orb
@@ -256,11 +266,11 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               
           </div>
          
-          {Number(data?.orbToken) === 0 && (
+          {Number(data?.orbToken) === 0 && Number(price) !== 0 && (
             <div className="flex justify-center">
               {data?.orbStatus && (
                 <button
-                  className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[30px] rounded-[6px] mt-12 mb-8"
+                  className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                   onClick={() => setOpenPurchase(true)}
                 >
                   Purchase a fraction
@@ -291,7 +301,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
                   {" "}
                   Ask Question
                 </button>
-                <button className="border-[#99E515] border-[1px] rounded-md text-[#99E515] px-[16px] py-[8px] text-[14px] leading-[26px] tracking-[0.46px] ">
+                <button className="border-[#99E515] border-[1px] rounded-md text-[#99E515] px-[16px] py-[8px] text-[14px] leading-[26px] tracking-[0.46px] mobile:px-[10px] mobile:py-[6px] mobile:text-[12px] mobile:leading-[18px] ">
                   Book Meeting
                 </button>
               </div>
@@ -301,6 +311,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         </div>
         {/* orb status */}
       </div>
+    
     </section>
   );
 }

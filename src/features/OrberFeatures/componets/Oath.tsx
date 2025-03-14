@@ -131,18 +131,18 @@ export default function Oath() {
 
   return (
     <section className="w-[90%] mx-auto mt-[72px]">
-      <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] ">
+      <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] mobile:text-[24px] mobile:leading-[30px] ">
         Oath
       </h2>
 
       <div
-        className="w-[40%] border-[1px] px-[1.5%] mt-[20px] rounded-2xl border-[#F4F4F4]"
+        className="w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%] border-[1px] px-[1.5%] mt-[20px] rounded-2xl border-[#F4F4F4]"
         style={{
           background:
             "linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.12) 100%)",
         }}
       >
-        <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center flex">
+        <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center text-justify flex mobile:text-[14px] mobile:leading-[20px]">
           {data?.orbHashData?.oathSworn}
         </p>
 
@@ -153,9 +153,9 @@ export default function Oath() {
 
         </p> */}
       </div>
-      <div className="flex flex-col gap-4 mt-[40px] w-[40%]">
+      <div className="flex flex-col gap-4 mt-[40px] w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%]">
         <div className="flex items-center gap-4">
-          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">
+          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">
             Privacy
           </h2>
           <p className="">..............</p>
@@ -167,7 +167,7 @@ export default function Oath() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">
+          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">
             Exclusivity
           </h2>
           <p className="">......................</p>
@@ -179,11 +179,17 @@ export default function Oath() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">
+          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">
             Oath sworn on
           </h2>
-          <p className="">
-            ...................................................................
+          <p className="lgDesktop:hidden">
+            ........................................................
+          </p>
+          <p className="hidden lgDesktop:block mobile:hidden">
+            ..............................................
+          </p>
+          <p className="hidden mobile:block">
+            ................
           </p>
 
           <div className="flex items-center">
@@ -193,11 +199,14 @@ export default function Oath() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px]">
+          <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">
             Oath honoured on
           </h2>
-          <p className="">
-            .............................................................
+          <p className="mobile:hidden">
+            ................................
+          </p>
+          <p className="hidden mobile:block">
+            ............
           </p>
 
           <div className="flex items-center">

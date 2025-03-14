@@ -10,7 +10,10 @@ import AskQuestion from "./componets/AskQuestion";
 import SwearOath from "./componets/SwearOath";
 import CoolDownPeriod from "./componets/CoolDownPeriod";
 import SetPrice from "./componets/SetPrice";
-import { useOrbDetailsStore } from "@/zustand/Wallet";
+import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet";
+import WalletConnectPopup from "@/components/WalletConnectPopup";
+import Loading from "@/components/Loading";
+
 
 export default function OrberFeatures() {
 
@@ -21,15 +24,16 @@ export default function OrberFeatures() {
   const [openCooldown, setOpenCooldown] = useState<boolean>(false)
   const [openPrice, setOpenPrice] = useState<boolean>(false)
   const [cooldownDays, setCooldownDays] = useState<number>(0)
-
-  console.log('cooldownDays cooldownDays', cooldownDays);
+  const {starknetAccount} = useWalletStore()  
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  // console.log('cooldownDays cooldownDays', cooldownDays);
   return (
 
-    <section className="text-white">
+    <section className="text-white overflow-y-scroll h-screen">
       <div className="relative">
         <div
-          className=""
-          style={{ position: "relative", width: "100%", height: "860px" }}
+          className="relative h-[860px] w-[100%] mobile:h-[800px] lgDesktop:h-[860px] smDesktop:h-[860px] smDesk:h-[860px] tabletAir:h-[860px]"
+          style={{ }}
         >
           <Image
             src="/images/Image.svg"
@@ -42,12 +46,13 @@ export default function OrberFeatures() {
           <Navbar title={`${name}'s Orb`} />
 
           <div className="">
-            <OrbHero setOpenInvoke={setOpenInvoke} setOpenPurchase={setOpenPurchase} setOpenOath={setOpenOath} setOpenCooldown={setOpenCooldown} setOpenPrice={setOpenPrice} cooldownDays={cooldownDays} />
+            <OrbHero setOpenInvoke={setOpenInvoke} setOpenPurchase={setOpenPurchase} setOpenOath={setOpenOath} setOpenCooldown={setOpenCooldown} setOpenPrice={setOpenPrice} cooldownDays={cooldownDays} setIsLoading={setIsLoading} />
           </div>
         </div>
-
+      
       </div>
       <MainSection setCooldownDays={setCooldownDays} />
+
       {openPurchase &&
 
         <Purchase setOpenPurchase={setOpenPurchase} />
@@ -68,6 +73,11 @@ export default function OrberFeatures() {
         <SetPrice setOpenPrice={setOpenPrice} />
       }
       <Footer />
+      {
+        !starknetAccount &&
+      <WalletConnectPopup />
+      }
+      { isLoading && <Loading />}
     </section>
   );
 }

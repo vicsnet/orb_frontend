@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/components/Loading";
 import { epochToTime } from "@/constant/constant";
 import { ProviderUrl, tokenAddress } from "@/constant/contract";
 // import { useAppSelector } from "@/redux/store";
@@ -6,6 +7,7 @@ import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
+import { toast } from "react-toastify";
 import {
   Contract,
   RpcProvider,
@@ -21,31 +23,29 @@ type OrbHeroProps = {
   setOpenCooldown: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
-  // const data = useAppSelector(
-  //   (state) => state?.OrbDetailsReducer?.OrbAccountDetails
-  // );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { starknetAccount } = useWalletStore();
   const { address } = useOrbDetailsStore();
 
-  // const starknetAccount = useAppSelector(
-  //   (state) => state?.walletReducer?.starknetAccount
-  // );
-
-  // const price = useAppSelector((state) => state?.PriceDataReducer?.price);
-  // const price:number = Number(633333333333333336)
-  // console.log("pricee", price);
-
-  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
-  // const contractAddress = useAppSelector(
-  //   (state) => state?.OrbDetailsReducer?.address
-  // );
   const [cooldownPeriod, setCooldownPeriod] = useState<number>(0);
   const [flaggingperiod, setFlaggingPeriod] = useState<number>(0);
 
 
 
   const setCooldown = async () => {
+    if (!starknetAccount) {
+      toast.error('Please connect your wallet');
+      setIsLoading(false);
+      return;
+    }
+    if (cooldownPeriod === 0 || flaggingperiod === 0) {
+      toast.error('All fields are required');
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
     if (flaggingperiod !== 0 && cooldownPeriod !== 0) {
@@ -57,9 +57,7 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
           const buyerAddress = starknetAccount?.account.address;
 
           const { abi: testAbi } = await provider.getClassAt(address);
-          // const { abi: tokenAbi } = await provider.getClassAt(tokenAddress);
 
-          // const signer = starknetAccount?.account.signer;
           const myWalletAccount = new WalletAccount(
             { nodeUrl: myFrontendProviderUrl },
             starknetAccount as any
@@ -71,20 +69,6 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
               address,
               myWalletAccount
             );
-            //   const tokencontractCall = new Contract(
-            //     tokenAbi,
-            //     tokenAddress,
-            //     myWalletAccount
-            //   );
-            //   tokencontractCall.connect(myWalletAccount);
-            //   const myTokenCall = tokencontractCall.populate("approve", [
-            //     contractAddress,
-            //     cairo.uint256(Number(price)),
-            //   ]);
-
-            //   const resToken = await myWalletAccount.execute(myTokenCall);
-            //   await provider.waitForTransaction(resToken.transaction_hash);
-            //   console.log("resToken", resToken.transaction_hash);
 
             contractCall.connect(myWalletAccount);
 
@@ -98,17 +82,20 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
             const res = await myWalletAccount.execute(myCall);
             await provider.waitForTransaction(res.transaction_hash);
             console.log(res.transaction_hash);
+            toast.success('Cooldown period set successfully');
+            setIsLoading(false);
+            setOpenCooldown(false);
           }
         }
 
 
       } catch (error) {
         console.error(error);
+        toast.error('Cooldown period not set');
+        setIsLoading(false);
       }
     }
-    else {
-      console.error('flagging period and cooldownPeriod can not be 0')
-    }
+
   };
 
   useEffect(() => {
@@ -116,8 +103,8 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
   }, []);
 
   return (
-    <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
-      <section className="w-[30%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px]">
+    <main className="w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar">
+      <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%]    mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px] lgDesktop:mt-[150px] smDesktop:mt-[150px] smDesk:mt-[200px] tabletAir:mt-[200px] mobile:mt-[150px] ">
         <div className=" mx-auto w-[90%] pt-4 pb-4">
           <div className="flex justify-between">
             <h2 className="text-[20px] leading-8 text-[#FFFFFF]">
@@ -134,11 +121,11 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
           <div className="w-[90%]  mt-9 mb-9 items-center bg-[#303033] py-[15px] px-[20px] gap-8 rounded-lg mx-auto">
 
             <div className="">
-              <input type="number" placeholder="Cooldown Period" className="contrast-more:border-slate-400 bg-transparent border-[1px] border-[#DCDEE0] h-[50px] w-[100%] px-4" onChange={(e) => setCooldownPeriod(Number(e.target.value))} />
+              <input type="number" placeholder="Cooldown Period" className="w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors" onChange={(e) => setCooldownPeriod(Number(e.target.value))} />
             </div>
 
             <div className="mt-4">
-              <input type="number" placeholder="Flagging Period" className="w-[100%] contrast-more:border-slate-400 bg-transparent border-[1px] border-[#DCDEE0] h-[50px] px-4" onChange={(e) => setFlaggingPeriod(Number(e.target.value))} />
+              <input type="number" placeholder="Flagging Period" className="w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors" onChange={(e) => setFlaggingPeriod(Number(e.target.value))} />
             </div>
           </div>
 
@@ -152,6 +139,7 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
           </div>
         </div>
       </section>
+      {isLoading && <Loading />}
     </main>
   );
 }

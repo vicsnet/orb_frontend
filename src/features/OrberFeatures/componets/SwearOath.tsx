@@ -4,6 +4,8 @@ import React, { useState } from 'react'
 import { MdClose } from 'react-icons/md'
 import { ByteArray, byteArray, cairo, CallData, Contract, RpcProvider, shortString, WalletAccount } from 'starknet';
 import {useOrbDetailsStore, useWalletStore} from "@/zustand/Wallet"
+import Loading from '@/components/Loading';
+import { toast } from 'react-toastify';
 interface invokePros {
   title: string | undefined
   setOpenOath: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,20 +14,27 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
   const [content, setContent] = useState<string>('');
   const [time, setTime] = useState<string>('');
   const [days, setDays] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {starknetAccount} = useWalletStore();
 
-  // const starknetAccount2 = useAppSelector(
-  //   (state) => state.walletReducer.starknetAccount
-  // );
-  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
   const {address} = useOrbDetailsStore()
 
-  // function isASCII(str: string) {
-  //   return /^[\x00-\x7F]*$/.test(str);
-  // }
+
 
   const invokeOrb = async () => {
+    if(!starknetAccount){
+      toast.error('Please connect your wallet');
+      setIsLoading(false);
+      return;
+    }
+    if(content === '' || time === '' || days === 0){
+      toast.error('All fields are required');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
@@ -71,7 +80,7 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
 
       const file = new File([jsonData], `${title}oath.json`, { type: "application/json" });
       formData.append("file", file);
-      // await formData.append("metadata", jsonBlob);
+      
       const request = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
         method: "POST",
         headers: {
@@ -91,28 +100,10 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
 
         const { abi: testAbi } = await provider.getClassAt(address);
         if (testAbi === undefined) {
-          throw new Error("no abi.");
+          toast.error('no abi');
+          setIsLoading(false);
+          return;
         }
-
-        // const myOrbContractCall = new Contract(testAbi, contract, provider);
-        // const buyerAddress = starknetAccount?.account.address;
-        // const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
-
-        // const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
-        // const contentHash = content;
-        // const longString: string[] = shortString
-        // .splitLongString(
-        //     dataContent
-        // )
-        // .map((str) => shortString.encodeShortString(str));
-
-        // const myByteArray = CallData.compile([byteArray.byteArrayFromString(dataContent)]);
-
-
-
-        // const myByteArray: ByteArray = byteArray.byteArrayFromString(dataContent);
-        // console.log('shortstring', myByteArray);
-
 
         const myWalletAccount = new WalletAccount(
           { nodeUrl: myFrontendProviderUrl },
@@ -125,10 +116,8 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
         );
 
         const date = new Date(time);
-        setOpenOath
+        // setOpenOath
         const epochTime = date.getTime() / 1000;
-
-
 
         contractCall.connect(myWalletAccount);
         const myInvokeCall = contractCall.populate("swear_oath", [
@@ -141,7 +130,9 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
         await provider.waitForTransaction(resToken.transaction_hash);
         console.log("resToken", resToken.transaction_hash);
         console.log('ended');
-
+        setOpenOath(false);
+        toast.success('OATH SWORN SUCCESSFULLY');
+        setIsLoading(false);
       }
 
 
@@ -149,18 +140,20 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
 
     } catch (error) {
       console.error(error);
+      toast.error('OATH NOT SWORN');
+      setIsLoading(false);
     }
 
 
   }
   return (
-    <main className='w-[100%] h-screen absolute top-0 backdrop-opacity-5'>
-      <section className="w-[30%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px]">
+    <main className='w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar'>
+      <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%]  mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px] lgDesktop:mt-[150px] smDesktop:mt-[100px] smDesk:mt-[50px] tabletAir:mt-[140px] mobile:mt-[50px] ">
         <div className=" mx-auto w-[90%] pt-4 pb-4">
           <div className="flex justify-between">
-            <p className=""></p>
+            {/* <p className=""></p> */}
             <h2 className="text-[20px] leading-8 text-[#FFFFFF] text-center">
-              Invoke {title}&apos;s Orb
+              Swear Oath
             </h2>
             <span className="cursor-pointer" >
               <MdClose
@@ -173,17 +166,17 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
 
           <div className=" mt-9 mb-9 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
             <div className="">
-              <textarea name="" id="" rows={10} placeholder='Oath' className='w-[100%] contrast-more:border-slate-400 bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 border-[#DCDEE0] border-[0.2px]' onChange={(e) => setContent(e.target.value)}></textarea>
+              <textarea name="" id="" rows={10} placeholder='Oath' className='w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors' onChange={(e) => setContent(e.target.value)}></textarea>
             </div>
 
-            <div className="">
+            <div className="mt-4">
               <label htmlFor="" className='capitalize'>honored until</label><br />
-              <input type="date" placeholder='date' className='contrast-more:border-slate-400 bg-transparent border-[1px] border-[#DCDEE0] rounded-[8px] p-2' onChange={(e) => setTime(e.target.value)} />
+              <input type="date" placeholder='date' className='bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors' onChange={(e) => setTime(e.target.value)} />
             </div>
 
-            <div className="">
-              <label htmlFor="" className='capitalize'>Response period</label><br />
-              <input type="number" placeholder='Response time in days' className='contrast-more:border-slate-400 bg-transparent border-[1px] border-[#DCDEE0] rounded-[8px] p-2' onChange={(e) => setDays(Number(e.target.value))} />
+            <div className="mt-4">
+              <label htmlFor="" className='text-[14px] font-medium text-[#FFFFFF] capitalize mb-2 block'>Response period</label>
+              <input type="number" placeholder='Response time in days' className=' bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors' onChange={(e) => setDays(Number(e.target.value))} />
             </div>
           </div>
 
@@ -197,6 +190,7 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
           </div>
         </div>
       </section>
+      {isLoading && <Loading />}
     </main>
   )
 }

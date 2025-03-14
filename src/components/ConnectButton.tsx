@@ -41,7 +41,7 @@ export default function ConnectButton() {
         // const myWalletAccount = new WalletAccount({ nodeUrl: myFrontendProviderUrl }, starknet);
         // const data  = walletConnect(starknet);
         const data = starknet;
-        console.log('ddddata', data);
+        // console.log('ddddata', data);
 
         setStarknetAccount(data);
         // dispatch(walletConnect(starknet));

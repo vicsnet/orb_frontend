@@ -172,11 +172,12 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                     const secondHalf = ipfsHash.slice(halfLength);
 
                     uploadDataToContract(firstHalf, secondHalf);
+                    toast.success('Orb Created Successfully');
+                    setIsLoading(false);
+                    setOpenCreateOrb(false);
                 }
             }
-            toast.success('Orb Created Successfully');
-            setIsLoading(false);
-            setOpenCreateOrb(false);
+            
 
         } catch (error) {
             console.error('error', error);
@@ -187,13 +188,12 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
     }
 
-    const mutation = useMutation({
-        mutationFn: (OrbCreation) => {
-            console.log('mutation...');
-            const data = createOrb()
-            return data;
-        },
-    });
+    // const mutation = useMutation({
+    //     mutationFn: (OrbCreation) => {
+    //         const data = createOrb()
+    //         return data;
+    //     },
+    // });
 
 
 
@@ -284,7 +284,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                             
                             <div
                                 className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center cursor-pointer"
-                                onClick={() => mutation.mutate()}
+                                onClick={() => createOrb()}
                             >
                               
                                 Create Orb

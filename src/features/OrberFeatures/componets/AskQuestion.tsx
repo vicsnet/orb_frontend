@@ -1,3 +1,4 @@
+import Loading from '@/components/Loading';
 import { orbInvocRegistryCA } from '@/constant/contract';
 // import { useAppSelector } from '@/redux/store';
 import { useOrbDetailsStore, useWalletStore } from '@/zustand/Wallet';
@@ -17,15 +18,18 @@ interface invokePros {
 export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
   const [content, setContent] = useState<string>('');
   const { address } = useOrbDetailsStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { starknetAccount } = useWalletStore()
 
-  // const starknetAccount = useAppSelector(
-  //   (state) => state?.walletReducer?.starknetAccount
-  // );
-  // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
+
 
   const invokeOrb = async () => {
+    if(content === ''){
+      toast.error('Please enter question');
+      return;
+    }
+    setIsLoading(true);
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
@@ -68,6 +72,9 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
           const resToken = await myWalletAccount.execute(myInvokeCall);
           await provider.waitForTransaction(resToken.transaction_hash);
           console.log("resToken", resToken.transaction_hash);
+          toast.success('Invoke successful');
+          setIsLoading(false);
+          setOpenInvoke(false);
 
           return resToken.transaction_hash
         }
@@ -78,32 +85,34 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
 
     } catch (error) {
       console.error(error);
+      toast.error('Invoke failed');
+      setIsLoading(false);
       return error
     }
 
 
   }
 
-  const mutation = useMutation({
-    mutationFn: (AskQuestion)=>{
-      const data = invokeOrb()
-      return data;
-    }, 
-  });
+//   const mutation = useMutation({
+//     mutationFn: (AskQuestion)=>{
+//       const data = invokeOrb()
+//       return data;
+//     }, 
+//   });
 
-  if(mutation.isSuccess){
-    toast.success(`tx:hash:${mutation.data}`)
-  }
-  if(mutation.error){
-  toast.error(`${mutation.error}`)
-}
+//   if(mutation.isSuccess){
+//     toast.success(`tx:hash:${mutation.data}`)
+//   }
+//   if(mutation.error){
+//   toast.error(`${mutation.error}`)
+// }
 
 
 
 
   return (
-    <main className='w-[100%] h-screen absolute top-0 backdrop-opacity-5'>
-      <section className="w-[30%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px]">
+    <main className='w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar'>
+      <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%]  mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px] lgDesktop:mt-[150px] smDesktop:mt-[100px] smDesk:mt-[50px] tabletAir:mt-[140px] mobile:mt-[50px]">
         <div className=" mx-auto w-[90%] pt-4 pb-4">
           <div className="flex justify-between">
             <p className=""></p>
@@ -129,9 +138,9 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
           <div className="mt-6 mb-4">
             <div
               className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center cursor-pointer"
-              onClick={()=>mutation.mutate()}
+              onClick={()=>invokeOrb()}
             >
-              {mutation.isPending ? 'Invoking ....' : 'Invoke'}
+              Invoke
               
             </div>
           </div>
@@ -140,6 +149,7 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
           </>
         </div>
       </section>
+      {isLoading && <Loading   />}
     </main>
   )
 }

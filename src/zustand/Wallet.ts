@@ -93,3 +93,15 @@ setOrbTerms: (data:Question[]) => set({
     data
 })
 }))
+
+export const useMainSectionStore = create<{
+  openRespond: boolean;
+  contentId: number;
+  setOpenRespond: React.Dispatch<React.SetStateAction<boolean>>;
+  setContentId: React.Dispatch<React.SetStateAction<number>>;
+}>((set) => ({
+  openRespond: false,
+  contentId: 0,
+  setOpenRespond: (value) => set({ openRespond: typeof value === 'function' ? value(false) : value }),
+  setContentId: (value) => set({ contentId: typeof value === 'function' ? value(0) : value }),
+}));

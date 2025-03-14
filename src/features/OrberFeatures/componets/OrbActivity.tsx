@@ -5,7 +5,7 @@ export default function OrbActivity() {
     return (
         <section className='w-[90%] mx-auto'>
             <div className="mt-[40px] w-[80%] mx-auto">
-                <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px]">Orb Activity</h2>
+                <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] mobile:text-[24px]">Orb Activity</h2>
 
                 <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] w-[38%] mt-[36px]">
                     This section shows a list of latest key events for this Orb: whenever it’s won in auction, purchased or had its price adjusted.

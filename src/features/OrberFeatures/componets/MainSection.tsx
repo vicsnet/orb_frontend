@@ -5,6 +5,8 @@ import Oath from "./Oath";
 import Questions from "./Questions";
 import OrbActivity from "./OrbActivity";
 import Invocation from "./Invocation";
+import RespondQuestion from "./RespondQuestion";
+import { useMainSectionStore } from "@/zustand/Wallet";
 
 type OrbHeroProps = {
   setCooldownDays: React.Dispatch<React.SetStateAction<number>>
@@ -13,6 +15,7 @@ type OrbHeroProps = {
 export default function MainSection({ setCooldownDays }: OrbHeroProps) {
   const [name, setName] = useState<String>('about')
 
+  const { openRespond, setOpenRespond, contentId, setContentId } = useMainSectionStore()
 
 
   return (
@@ -57,6 +60,10 @@ export default function MainSection({ setCooldownDays }: OrbHeroProps) {
         //   {/* Invocation */}
         <section className="">
           <Invocation />
+          {
+            openRespond &&
+            <RespondQuestion setOpenRespond={setOpenRespond} contentId={contentId} />
+          }
         </section>
       }
 

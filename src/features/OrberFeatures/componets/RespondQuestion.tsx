@@ -5,6 +5,7 @@ import { byteArray, cairo, CallData, Contract, RpcProvider, WalletAccount } from
 import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import Loading from '@/components/Loading';
 
 interface invokePros {
   // title: string | undefined
@@ -16,11 +17,17 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
   const { starknetAccount } = useWalletStore()
   const [content, setContent] = useState<string>('');
 
-
   const { address } = useOrbDetailsStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
 
 
   const RespondToInvocation = async () => {
+    if (content === '') {
+      toast.error(`content is required`)
+      return;
+    }
+    setIsLoading(true);
     const myFrontendProviderUrl =
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
@@ -34,13 +41,13 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
           throw new Error("no abi.");
         }
 
-        const myOrbContractCall = new Contract(testAbi, address, provider);
-        const buyerAddress = starknetAccount?.account.address;
+        // const myOrbContractCall = new Contract(testAbi, address, provider);
+        // const buyerAddress = starknetAccount?.account.address;
         // const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
         const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
         // const contentHash = content;
-        const contentHash = CallData.compile([byteArray.byteArrayFromString(content)]);
+        // const contentHash = CallData.compile([byteArray.byteArrayFromString(content)]);
         const myWalletAccount = new WalletAccount(
           { nodeUrl: myFrontendProviderUrl },
           starknetAccount as any
@@ -62,6 +69,9 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
         await provider.waitForTransaction(resToken.transaction_hash);
         console.log("resToken", resToken.transaction_hash);
         const data = resToken.transaction_hash
+        toast.success(`content responded successfully`)
+        setIsLoading(false);
+        setOpenRespond(false);
         return data
       }
 
@@ -69,6 +79,8 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
 
 
     } catch (error) {
+      toast.error(`content responded failed`)
+      setIsLoading(false);
       // throw new Error(${error})
       console.error(error);
     }
@@ -76,24 +88,24 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
 
   }
 
-  const mutation = useMutation({
-    mutationFn: (Respond)=>{
-      const data = RespondToInvocation()
-      return data;
-    },
-  });
+  // const mutation = useMutation({
+  //   mutationFn: (Respond) => {
+  //     const data = RespondToInvocation()
+  //     return data;
+  //   },
+  // });
 
-  if (mutation.isSuccess) {
-    setOpenRespond(false)
-    toast.success(`tx:hash:${mutation.data}`)
-  }
-  if (mutation.error) {
-    toast.error(`${mutation.error}`)
-  }
+  // if (mutation.isSuccess) {
+  //   setOpenRespond?.(false)
+  //   toast.success(`tx:hash:${mutation.data}`)
+  // }
+  // if (mutation.error) {
+  //   toast.error(`${mutation.error}`)
+  // }
 
   return (
-    <main className='w-[100%] h-screen absolute top-0 backdrop-opacity-5 z-index-[1]'>
-      <section className="w-[30%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px]">
+    <main className='w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar'>
+      <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%]  mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[200px] lgDesktop:mt-[150px] smDesktop:mt-[100px] smDesk:mt-[50px] tabletAir:mt-[140px] mobile:mt-[50px]">
         <div className=" mx-auto w-[90%] pt-4 pb-4">
           <div className="flex justify-between">
             <p className=""></p>
@@ -104,7 +116,7 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
               <MdClose
                 size={24}
                 className=""
-                onClick={() => setOpenRespond(false)}
+                onClick={() => setOpenRespond?.(false)}
               />
             </span>
           </div>
@@ -119,14 +131,15 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
           <div className="mt-6 mb-4">
             <div
               className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center cursor-pointer "
-              onClick={()=>mutation.mutate()}
+              onClick={() => RespondToInvocation()}
             >
-              {mutation.isPending ? 'Responding ...' : 'Respond'}
-              
+              Respond
+
             </div>
           </div>
         </div>
       </section>
+      {isLoading && <Loading />}
     </main>
   )
 }

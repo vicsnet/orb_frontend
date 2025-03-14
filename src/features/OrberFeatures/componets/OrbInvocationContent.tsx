@@ -9,8 +9,12 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { ByteArray, byteArray, cairo, Contract, hash, num, RpcProvider, uint256, Uint256, WalletAccount, } from 'starknet';
 import RespondQuestion from './RespondQuestion';
 // import {StarknetWalletProvider} from 'get-starknet'
-import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
+import { useMainSectionStore, useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
 import { useQuery } from '@tanstack/react-query';
+import { TbArrowAutofitContent } from "react-icons/tb";
+import Loading from '@/components/Loading';
+import { toast } from 'react-toastify';
+
 
 interface EMITTED_EVENT {
     // blockHash: string;
@@ -22,6 +26,7 @@ interface EMITTED_EVENT {
 }
 export default function OrbInvocationContent() {
     const { starknetAccount } = useWalletStore()
+   const { setOpenRespond, setContentId } = useMainSectionStore()
 
     // const starknetAccount2 = useAppSelector(
     //     (state) => state?.walletReducer?.starknetAccount
@@ -29,11 +34,12 @@ export default function OrbInvocationContent() {
 
     // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
     const { address } = useOrbDetailsStore();
+   
+    
 
     // const [contentData, setContentData] = useState<EMITTED_EVENT[]>([])
     // const [respData, setRespData] = useState<EMITTED_EVENT[]>([])
-    const [openRespond, setOpenRespond] = useState<boolean>(false)
-    const [contentId, setContentId] = useState<number>(0)
+   
 
     const getInvocation = async () => {
         const myFrontendProviderUrl =
@@ -56,17 +62,18 @@ export default function OrbInvocationContent() {
         // const result = uint256.uint256ToBN(uint256Value);
 
         // console.log('invocList', eventsList.events);
+        // console.log('invocListData', eventsList.events[0].data);
 
 
 
-        const uint256Value: Uint256 = { low: eventsList.events[1].data[3], high: eventsList.events[1].data[4] };
+        const uint256Value: Uint256 = { low: eventsList.events[0]?.data[3], high: eventsList.events[0]?.data[4] };
         const date = uint256.uint256ToBN(uint256Value);
 
         const recentDate = epochToTime(Number(date).toString())
 
         // console.log('result2..', recentDate);
 
-        const address2 = eventsList.events[1].data[2]
+        const address2 = eventsList.events[0].data[2]
         // console.log('address', address2);
 
         // const invocIdUint256: Uint256 = { low: eventsList.events[1].data[0], high: eventsList.events[1].data[1], }
@@ -96,7 +103,7 @@ export default function OrbInvocationContent() {
             chunk_size: 10,
         });
 
-        // console.log('ResponseListEvent', ResponseList.events);
+        console.log('ResponseListEvent', ResponseList.events);
 
         const responseData = ResponseList.events
 
@@ -115,8 +122,8 @@ export default function OrbInvocationContent() {
 
         // setRespData(filterResponse);
 
-        return ({contentData:filteredData, respData:filterResponse})
-        // console.log('filterResponse', filterResponse);
+        console.log('filterResponse', filterResponse);
+        return ({ contentData: filteredData, respData: filterResponse })
 
 
 
@@ -146,7 +153,11 @@ export default function OrbInvocationContent() {
 
                 const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
 
-
+                if (testAbi === undefined) {
+                    toast.error("no abi.");
+                    return;
+                    
+                }
                 const myWalletAccount = new WalletAccount(
                     { nodeUrl: myFrontendProviderUrl },
                     starknetAccount as any
@@ -159,7 +170,6 @@ export default function OrbInvocationContent() {
 
                 contractCall.connect(myWalletAccount);
                 const myInvokeCall = contractCall.populate("rate_positive_reponse", [
-
                     address,
                     cairo.uint256(Number(id)),
                     cairo.uint256(Number(myOrbId)),
@@ -174,7 +184,7 @@ export default function OrbInvocationContent() {
 
 
         } catch (error) {
-            console.error(error);
+            console.error("like error", error);
         }
 
 
@@ -244,28 +254,44 @@ export default function OrbInvocationContent() {
     const { isPending, isError, data, error } = useQuery({
         queryKey: ['FetchInvocation'],
         queryFn: async () => {
-          const data = await getInvocation()
-          return data
+            const data = await getInvocation()
+            return data
         },
-      })
+    })
 
-      console.log('invocation data', data);
-      
+    console.log('invocation data', data);
+   
+
     // useEffect(() => {
     //     getInvocation()
     // }, [])
 
     return (
         <div className="relative">
+            
 
-            <div className='w-[40%]'>
+            {data?.contentData.length === 0 && 
+            <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
+            <TbArrowAutofitContent className='text-[#99E515] text-[120px] font-bold  tracking-[0.15px] mobile:text-[60px]' />
+
+            <p className='text-center text-[20px] font-bold leading-[28px] tracking-[0.15px] text-[#99E515] mt-6 mobile:text-[16px]'>No Invocations Yet</p>
+            <p className='text-center text-[16px] leading-[24px] tracking-[0.15px] text-[#A1A3A7] mt-2 w-[80%] mobile:text-[14px]'>
+                This Orb hasn't received any invocations. Be the first to invoke it!
+            </p>
+        </div>
+            }
+            <div className='w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%]'>
                 {data?.contentData.map((content, index) => {
                     if (content) {
+                        
+                        
+                        
                         const myByteArray = {
-                            data: [content.data[6]],
-                            pending_word: content.data[7],
-                            pending_word_len: content.data[8]
+                            data: content.data.slice(6, content.data.length - 1),
+                            pending_word: 0,
+                            pending_word_len: content.data.slice(6, content.data.length - 1).length
                         };
+                       
                         const result = byteArray.stringFromByteArray(myByteArray);
 
                         const uint256Value = { low: content.data[3], high: content.data[4] };
@@ -280,128 +306,141 @@ export default function OrbInvocationContent() {
                         const invocId = uint256.uint256ToBN(invocIdUint256);
 
                         return (
-                            <div key={index} className="flex flex-col gap-2 mb-4">
-                                <div className="flex gap-2 items-center">
-                                    <Image src="/images/Identicon.svg" alt="user" width={40} height={40} />
-                                    <p className="text-[14px] font-bold leading-[20px] tracking-[0.1px]">
-                                        {address.slice(0, 5)}...{address.slice(-3)}
-                                    </p>
-                                    <p className="text-[12px] font-normal leading-[20px] tracking-[0.17px] text-[#A1A3A7]">{newDate}</p>
+                            <div key={index} className="p-6 mb-6 rounded-lg bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.08)] transition-all duration-200">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <Image 
+                                        src="/images/Identicon.svg" 
+                                        alt="user" 
+                                        width={40} 
+                                        height={40}
+                                        className="rounded-full" 
+                                    />
+                                    <div>
+                                        <p className="text-[14px] font-medium text-white">
+                                            {address.slice(0, 5)}...{address.slice(-3)}
+                                        </p>
+                                        <p className="text-[12px] text-[#A1A3A7]">{newDate}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-[16px] font-bold tracking-[0.15px] text-[#FFF]">
+
+                                <div className="mb-4">
+                                    <p className="text-[16px] font-medium text-white leading-relaxed text-justify mobile:text-[14px] mobile:leading-relaxed">
                                         {result}
                                     </p>
                                 </div>
-                                <div className="text-[#DDDEE0] font-bold text-[14px] leading-[24px] mt-2">
-                                    <a href={`https://sepolia.voyager.online/tx/${trans}`} className='flex gap-[4px]'>
-                                        <p>
-                                            Tx: {trans.slice(0, 5)}...{trans.slice(-3)}
-                                        </p>
-                                        <Image src="/images/Group.svg" alt='FAQ' width={16} height={16} className='ease-in transition duration-300 cursor-pointer' />
+
+                                <div className="mb-4">
+                                    <a 
+                                        href={`https://sepolia.voyager.online/tx/${trans}`} 
+                                        className="inline-flex items-center gap-2 text-[14px] text-[#DDDEE0] hover:text-[#99E515] transition-colors"
+                                    >
+                                        <span>Tx: {trans.slice(0, 5)}...{trans.slice(-3)}</span>
+                                        <Image src="/images/Group.svg" alt='External link' width={16} height={16} />
                                     </a>
                                 </div>
 
+                                {/* Responses section */}
+                                <div className="space-y-4 mb-4">
+                                    {data?.respData.map((resp, respIndex) => {
+                                        let result22: String;
 
-                                {data?.respData.map((resp, respIndex) => {
-                                    let result22: String;
+                                        const hash = resp.transaction_hash;
+                                        
+                                            const myByteArray2: ByteArray = {
+                                                data: resp.data.slice(6, resp.data.length - 1),
+                                                pending_word: 0,
+                                                pending_word_len: resp.data.slice(6, resp.data.length - 1).length
+                                            }
+                                        
+                                            result22 = byteArray.stringFromByteArray(myByteArray2);
+                                        
 
-                                    const hash = resp.transaction_hash;
-                                    if (resp.data.length < 10) {
-                                        const myByteArray2: ByteArray = {
-                                            data: [],
-                                            pending_word: resp.data[6],
-                                            pending_word_len: Number(resp.data[7])
-                                        }
-                                        result22 = byteArray.stringFromByteArray(myByteArray2);
+                                        const invocIdUint2562: Uint256 = { low: resp.data[0], high: resp.data[1] }
+                                        const invocId2 = uint256.uint256ToBN(invocIdUint2562)
+                                        const address2 = resp.data[2]
 
+                                        if (Number(invocId2) === Number(invocId)) {
+                                            const uint256Value2: Uint256 = { low: resp.data[3], high: resp.data[4] };
+                                            const date2 = uint256.uint256ToBN(uint256Value2);
+                                            const honoredDate2 = new Date(Number(Number(date2) * 1000));
+                                            const newDate2 = timeAgo(honoredDate2.toString())
 
-                                    }
-                                    else {
-                                        const myByteArray2: ByteArray = {
-                                            data: [resp?.data[6], resp?.data[7]],
-                                            pending_word: resp?.data[8],
-                                            pending_word_len: Number(resp?.data[9])
-                                        }
-                                        result22 = byteArray.stringFromByteArray(myByteArray2);
-
-                                    }
-                                    const invocIdUint2562: Uint256 = { low: resp.data[0], high: resp.data[1], }
-
-
-                                    const invocId2 = uint256.uint256ToBN(invocIdUint2562)
-
-                                    const address2 = resp.data[2]
-                                    console.log('address2', address2);
-                                    if (Number(invocId2) === Number(invocId)) {
-
-                                        const uint256Value2: Uint256 = { low: resp.data[3], high: resp.data[4] };
-                                        const date2 = uint256.uint256ToBN(uint256Value2);
-                                        const honoredDate2 = new Date(Number(Number(date2) * 1000));
-                                        const newDate2 = timeAgo(honoredDate2.toString())
-
-
-                                        // console.log('result22', result22);
-
-                                        return (
-                                            <div key={respIndex} className="mt-[4px] flex flex-col gap-2">
-                                                <div className="flex gap-2 items-center">
-                                                    <p className="text-[14px] font-bold leading-[20px] tracking-[0.1px]">
-                                                        {address2.slice(0, 5)} ... {address2.slice(-3)} Response
-                                                    </p>
-                                                    <p className="text-[12px] font-normal leading-[20px] tracking-[0.17px] text-[#A1A3A7]"> {newDate2}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[16px] font-bold tracking-[0.15px] text-[#FFF]">
-
-                                                        {result22}
-                                                    </p>
-                                                </div>
-                                                <div className="text-[#DDDEE0] font-bold text-[14px] leading-[24px] mt-2">
-                                                    <a href={`https://sepolia.voyager.online/tx/${hash}`} className='flex gap-[4px]'>
-                                                        <p>
-                                                            Tx: {hash.slice(0, 5)}...{hash.slice(-3)}
+                                            return (
+                                                <div key={respIndex} className="pl-4 border-l-2 border-[#99E515]">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <p className="text-[14px] font-medium text-[#99E515]">
+                                                            {address2.slice(0, 5)}...{address2.slice(-3)} Response
                                                         </p>
-                                                        <Image src="/images/Group.svg" alt='FAQ' width={16} height={16} className='ease-in transition duration-300 cursor-pointer' />
+                                                        <p className="text-[12px] text-[#A1A3A7]">{newDate2}</p>
+                                                    </div>
+                                                    
+                                                    <p className="text-[15px] text-white mb-2 text-justify mobile:text-[13px] mobile:leading-relaxed">{result22}</p>
+                                                    
+                                                    <a 
+                                                        href={`https://sepolia.voyager.online/tx/${hash}`} 
+                                                        className="inline-flex items-center gap-2 text-[13px] text-[#DDDEE0] hover:text-[#99E515] transition-colors"
+                                                    >
+                                                        <span>Tx: {hash.slice(0, 5)}...{hash.slice(-3)}</span>
+                                                        <Image src="/images/Group.svg" alt='External link' width={14} height={14} />
                                                     </a>
                                                 </div>
+                                            )
+                                        }
+                                    })}
+                                </div>
 
+                                <div className="flex items-center justify-between px-2 py-3 border-t border-[#2C2D30] mt-4">
+                                    <button 
+                                        onClick={() => { 
+                                            setOpenRespond(true); 
+                                            setContentId(Number(invocId));
+                                        }}
+                                        disabled={data?.respData.some(resp => Number(uint256.uint256ToBN({ low: resp.data[0], high: resp.data[1] })) === Number(invocId))}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
+                                            data?.respData.some(resp => Number(uint256.uint256ToBN({ low: resp.data[0], high: resp.data[1] })) === Number(invocId))
+                                            ? 'bg-[#1C1D1F]/50 text-[#DDDEE0]/50 cursor-not-allowed'
+                                            : 'bg-[#1C1D1F] text-[#DDDEE0] hover:text-[#99E515] hover:bg-[#232427] transition-all'
+                                        }`}
+                                    >
+                                        <FaComment size={14} />
+                                        <span className="text-[13px] font-medium">Respond</span>
+                                    </button>
 
-                                            </div>
-                                        )
-                                    }
-
-                                }
-                                )}
-
-                                <div className=" flex items-center gap-4">
-
-                                    <div className="flex gap-2 items-center cursor-pointer" onClick={() => { setOpenRespond(true); setContentId(Number(invocId)) }}>
-                                        <FaComment size={16} className='text-[#DDDEE0] font-bold' />
-                                        <p className="text-[#DDDEE0] font-bold text-[14px] leading-[24px]">respond</p>
-                                    </div>
-                                    <div className='text-[#DDDEE0] font-bold flex gap-2 items-center'>
-                                        <div className="">
-                                            <AiOutlineLike size={16} onClick={() => LikeContent(Number(invocId))} />
+                                    {data?.respData.some(resp => Number(uint256.uint256ToBN({ low: resp.data[0], high: resp.data[1] })) === Number(invocId)) && (
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={() => LikeContent(Number(invocId))}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1C1D1F] text-[#DDDEE0] hover:text-[#99E515] hover:bg-[#232427] transition-all"
+                                            >
+                                                <AiOutlineLike size={16} />
+                                                <span className="text-[13px] font-medium">Like</span>
+                                            </button>
+                                            <button
+                                                onClick={() => disLikeContent(Number(invocId))}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1C1D1F] text-[#DDDEE0] hover:text-[#99E515] hover:bg-[#232427] transition-all"
+                                            >
+                                                <AiOutlineDislike size={16} />
+                                                <span className="text-[13px] font-medium">Dislike</span>
+                                            </button>
                                         </div>
-                                        <div className="">
-
-                                            <AiOutlineDislike size={16} onClick={() => disLikeContent(Number(invocId))} />
-                                        </div>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         );
                     } else {
-                        return <p key={index}>No invocation yet.</p>;
+                        return  <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
+                        <TbArrowAutofitContent className='text-[#99E515] text-[120px] font-bold  tracking-[0.15px] mobile:text-[60px]' />
+            
+                        <p className='text-center text-[20px] font-bold leading-[28px] tracking-[0.15px] text-[#99E515] mt-6 mobile:text-[16px]'>No Invocations Yet</p>
+                        <p className='text-center text-[16px] leading-[24px] tracking-[0.15px] text-[#A1A3A7] mt-2 w-[80%] mobile:text-[14px]'>
+                            This Orb hasn't received any invocations. Be the first to invoke it!
+                        </p>
+                    </div>;
                     }
                 })}
             </div>
-            {
-                openRespond &&
-                <RespondQuestion setOpenRespond={setOpenRespond} contentId={contentId} />
+            {/* <Loading /> */}
 
-            }
         </div>
 
         // {/* question */}

@@ -44,8 +44,8 @@ export default function Oath() {
   });
 
   // const contract = useAppSelector((state) => state.OrbDetailsReducer.address);
-  const {address} = useOrbDetailsStore()
-  const {setOrbTerms} = useOrbtermsStore()
+  const { address } = useOrbDetailsStore()
+  const { setOrbTerms } = useOrbtermsStore()
   // const dispatch = useDispatch<AppDispatch>();
   // const [orbHashData, setOrbHashData] = useState<null | data>(null);
 
@@ -101,11 +101,11 @@ export default function Oath() {
             setOrbTerms(data);
 
             console.log('orb terms data', data);
-            return({honoredUntil:honoredDate.toString(),orbHashData:orbData})
+            return ({ honoredUntil: honoredDate.toString(), orbHashData: orbData })
           }
 
         }
-        return({honoredUntil:honoredDate.toString()})
+        return ({ honoredUntil: honoredDate.toString() })
 
 
       }
@@ -122,7 +122,7 @@ export default function Oath() {
   })
 
   // console.log('dataorbHashData',data?.orbHashData);
-  
+
 
   // useEffect(() => {
   //   fetchData()

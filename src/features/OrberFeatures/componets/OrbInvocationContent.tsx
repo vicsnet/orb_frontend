@@ -269,14 +269,13 @@ export default function OrbInvocationContent() {
     return (
         <div className="relative">
             
-
             {data?.contentData.length === 0 && 
             <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
             <TbArrowAutofitContent className='text-[#99E515] text-[120px] font-bold  tracking-[0.15px] mobile:text-[60px]' />
 
             <p className='text-center text-[20px] font-bold leading-[28px] tracking-[0.15px] text-[#99E515] mt-6 mobile:text-[16px]'>No Invocations Yet</p>
             <p className='text-center text-[16px] leading-[24px] tracking-[0.15px] text-[#A1A3A7] mt-2 w-[80%] mobile:text-[14px]'>
-                This Orb hasn't received any invocations. Be the first to invoke it!
+                This Orb hasn&#39;t received any invocations. Be the first to invoke it!
             </p>
         </div>
             }
@@ -428,14 +427,14 @@ export default function OrbInvocationContent() {
                             </div>
                         );
                     } else {
-                        return  <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
+                        <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
                         <TbArrowAutofitContent className='text-[#99E515] text-[120px] font-bold  tracking-[0.15px] mobile:text-[60px]' />
             
                         <p className='text-center text-[20px] font-bold leading-[28px] tracking-[0.15px] text-[#99E515] mt-6 mobile:text-[16px]'>No Invocations Yet</p>
                         <p className='text-center text-[16px] leading-[24px] tracking-[0.15px] text-[#A1A3A7] mt-2 w-[80%] mobile:text-[14px]'>
-                            This Orb hasn't received any invocations. Be the first to invoke it!
+                            This Orb hasn&#39;t received any invocations. Be the first to invoke it!
                         </p>
-                    </div>;
+                    </div>
                     }
                 })}
             </div>

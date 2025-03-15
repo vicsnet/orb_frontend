@@ -5,7 +5,7 @@ import { MdLockClock } from "react-icons/md";
 export default function OrbActivity() {
     return (
         <section className='w-[90%] mx-auto'>
-            <div className="mt-[40px] w-[80%] mx-auto">
+            <div className="mt-[40px] w-[80%] mobile:w-[100%] mx-auto">
                 <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] mobile:text-[24px]">Orb Activity</h2>
 
                 <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] w-[38%] lgDesktop:w-[45%] smDesktop:w-[60%] tabletAir:w-[80%] mobile:w-[100%] mt-[36px] mobile:text-[14px]">

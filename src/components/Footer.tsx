@@ -72,7 +72,7 @@ export default function Footer({ setOpenCreateOrb }: OrbFooterProps) {
 
         {/* main Footer */}
         <div className="mt-[50px] pb-[20px]">
-          <h1 className='text-[128px] font-normal leading-[163.84px] text-center text-[#E0FE82] logo tabletAir:text-[80px] mobile:text-[48px]' >ORB SPACE</h1>
+          <h1 className="text-[128px] leading-[163.84px] text-center text-[#E0FE82] tabletAir:text-[80px] mobile:text-[48px] font-['Fruktur'] font-normal" >ORB SPACE</h1>
           <p className="text-[20px] font-bold leading-[130%] tracking-[0.15px] text-center">© 2023 Orbspace Technologies. All rights reserved.
           </p>
           <p className="text-[20px] font-bold leading-[130%] tracking-[0.15px] text-center mt-1 tabletAir:text-[16px] mobile:text-[14px]">

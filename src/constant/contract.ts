@@ -1,5 +1,5 @@
-export const orbInvocRegistryCA = "0x072d31f3f2e5a9f6d8a8342fb4b33a2c0ddc89eec5d5debdde06cf23ee92a0d7";
-export const orbPondCA = "0x2e21c29998d57beef5aa6475e1efc3044a9294ecb53c645f95282d137b6e80";
+export const orbInvocRegistryCA = "0x042f2e84d3d81f428736750ffd2b929dff321cbaa10c720a734ec9eb553b1051";
+export const orbPondCA = "0x0448ab08d8a168fd5fd1909d946f29e03af497f38354e24dec10e872652dada7";
 
 export const tokenAddress = "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d";
 export const ProviderUrl =

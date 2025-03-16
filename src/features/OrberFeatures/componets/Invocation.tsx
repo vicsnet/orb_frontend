@@ -4,6 +4,7 @@ import OrbInvocationPrivate from './OrbInvocationPrivate'
 
 
 export default function Invocation() {
+  
   return (
     <section className='w-[90%] mx-auto'>
        <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] mt-[100px] mb-[46px] mobile:mt-[70px] mobile:text-[24px]">
@@ -16,7 +17,7 @@ export default function Invocation() {
         <OrbInvocationContent/>
         {/* <OrbInvocationPrivate/> */}
         
-
+      
         </section>
         </section >
   )

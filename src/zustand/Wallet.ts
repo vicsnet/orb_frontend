@@ -1,6 +1,6 @@
 import { StarknetWindowObject } from 'get-starknet'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 
 
@@ -16,7 +16,7 @@ type PriceState = {
     setOrbPrice: (price: string) => void;
 }
 
-type OrbDetailsData ={
+type OrbDetailsData = {
     name: string | null,
     description: string | null,
     image: string | null,
@@ -24,8 +24,15 @@ type OrbDetailsData ={
     x_account: string | null,
     farcaster: string | null,
     address: string | null,
-
-    setOrbDetailsData:(name:string, description:string, image:string, creator: string, x_account:string, farcaster:string, address:string) => void;
+    setOrbDetailsData: (data: {
+        name: string,
+        description: string,
+        image: string,
+        creator: string,
+        x_account: string,
+        farcaster: string,
+        address: string
+    }) => void;
 }
 
 interface Question {
@@ -40,10 +47,9 @@ type OrbTerms = {
 
 }
 
-export const useWalletStore = create<WalletState>((set) =>
-(
-    {
-
+export const useWalletStore = create<WalletState>()(
+  persist(
+    (set) => ({
         starknetAccount: null,
         error: null,
         setStarknetAccount: (account) => set({
@@ -54,45 +60,89 @@ export const useWalletStore = create<WalletState>((set) =>
             starknetAccount: null,
             error: null
         }),
+    }),
+    {
+      name: 'wallet-storage',
+      storage: createJSONStorage(() => localStorage),
     }
+  )
 )
+
+export const useOrbprice = create<PriceState>()(
+  persist(
+    (set) => ({
+      price: null,
+      setOrbPrice: (price) => set({
+        price: price,
+      })
+    }),
+    {
+      name: 'orb-price-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
 )
 
-export const useOrbprice = create<PriceState>((set) => (
-    { 
-        price: null,
-        setOrbPrice: (price) =>set({
-            price:price,
-        })
+export const useOrbDetailsStore = create<OrbDetailsData>()(
+  persist(
+    (set) => ({
+      name: null,
+      description: null,
+      image: null,
+      creator: null,
+      x_account: null,
+      farcaster: null,
+      address: null,
+      setOrbDetailsData: (data: {
+        name: string,
+        description: string,
+        image: string,
+        creator: string,
+        x_account: string,
+        farcaster: string,
+        address: string
+      }) => set({
+        name: data.name,
+        description: data.description,
+        image: data.image,
+        creator: data.creator,
+        x_account: data.x_account,
+        farcaster: data.farcaster,
+        address: data.address
+      }),
+    }),
+    {
+      name: 'orb-details-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        name: state.name,
+        description: state.description,
+        image: state.image,
+        creator: state.creator,
+        x_account: state.x_account,
+        farcaster: state.farcaster,
+        address: state.address
+      })
+    }
+  )
+)
 
-     }
-))
+export const useOrbtermsStore = create<OrbTerms>()(
+  persist(
+    (set) => ({
+      data: null,
+      setOrbTerms: (data:Question[]) => set({
+        data
+      })
+    }),
+    {
+      name: 'orb-terms-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+)
 
-export const useOrbDetailsStore = create<OrbDetailsData>((set)=>({
-    name: null,
-    description: null,
-    image: null,
-    creator: null,
-    x_account: null,
-    farcaster: null,
-    address:null,
-    setOrbDetailsData:(name:string, description:string, image:string, creator: string, x_account:string, farcaster:string, address:string) => set({
-        name,
-        description,
-        image,
-        creator,
-        x_account,
-        farcaster,
-        address,
-    })
-}))
 
-export const useOrbtermsStore = create<OrbTerms>((set)=>({
-data: null,
-setOrbTerms: (data:Question[]) => set({
-    data
-})
-}))
 
 export const useMainSectionStore = create<{
   openRespond: boolean;
@@ -105,3 +155,13 @@ export const useMainSectionStore = create<{
   setOpenRespond: (value) => set({ openRespond: typeof value === 'function' ? value(false) : value }),
   setContentId: (value) => set({ contentId: typeof value === 'function' ? value(0) : value }),
 }));
+
+export const createLoading = create<{
+    loading: boolean;
+    setLoading: (value: boolean | ((prev: boolean) => boolean)) => void;
+}>((set) => ({
+    loading: false,
+    setLoading: (value) => set({ loading: typeof value === 'function' ? value(false) : value }),
+}))
+
+

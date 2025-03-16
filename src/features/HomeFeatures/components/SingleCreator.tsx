@@ -131,8 +131,16 @@ export default function SingleCreator(props: CreatorProps) {
         <p className="text-[14px] font-bold tracking-[0.1px]">created by {!loading && data?.creator}</p>
         <button onClick={() => {
           data &&
-         
-            setOrbDetailsData(data.name, data.description, data.image, data.creator, data.x_account, data.farcater, address)
+
+            setOrbDetailsData({
+              name: data.name,
+              description: data.description,
+              image: data.image,
+              creator: data.creator,
+              x_account: data.x_account,
+              farcaster: data.farcater,
+              address: address
+            })
 
         }} className='bg-[#99E515] mt-3 text-[14px] font-bold leading-[24px] tracking-[0.4px] text-center w-[156px] h-[32px] rounded-[6px] text-[#121312]'>
           <Link href={{

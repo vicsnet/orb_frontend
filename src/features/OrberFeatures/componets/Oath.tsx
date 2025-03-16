@@ -113,20 +113,24 @@ export default function Oath() {
       console.error(error);
     }
   };
-  const { isPending, isError, data, error } = useQuery({
+  const { isPending, isError, data, error ,refetch} = useQuery({
     queryKey: ['FetchOrbHashData'],
     queryFn: async () => {
       const data = await fetchData()
       return data
     },
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnReconnect: true // Refetch when reconnecting
   })
 
   // console.log('dataorbHashData',data?.orbHashData);
 
 
-  // useEffect(() => {
-  //   fetchData()
-  // },[]);
+  useEffect(() => {
+    refetch()
+  },[]);
 
 
   return (
@@ -134,6 +138,13 @@ export default function Oath() {
       <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.5px] mobile:text-[24px] mobile:leading-[30px] ">
         Oath
       </h2>
+      {isPending && (
+        <div className="w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%] mt-[20px]">
+          <p className="text-[16px] font-bold tracking-[0.15px] text-gray-400 italic">
+            Loading oath details...
+          </p>
+        </div>
+      )}
 
       <div
         className="w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%] border-[1px] px-[1.5%] mt-[20px] rounded-2xl border-[#F4F4F4]"
@@ -142,18 +153,18 @@ export default function Oath() {
             "linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.12) 100%)",
         }}
       >
-        <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center text-justify flex mobile:text-[14px] mobile:leading-[20px]">
-          {data?.orbHashData?.oathSworn}
-        </p>
-
-        {/* //   <p className="text-center  text-[20px] font-bold leading-[26px] tracking-[0.15px] mt-8 text-[#99E515]">Orbs Terms of Service</p> <br/>
-        // <p className="text-[16px] font-bold  tracking-[0.15px] py-[3%] justify-center">
-        //   {orbHashData?.terms}
-
-
-        </p> */}
+        {data?.orbHashData?.oathSworn ? (
+          <p className="text-[16px] font-bold tracking-[0.15px] py-[3%] justify-center text-justify flex mobile:text-[14px] mobile:leading-[20px]">
+            {data.orbHashData.oathSworn}
+          </p>
+        ) : (
+          <p className="text-[16px] font-bold tracking-[0.15px] py-[3%] justify-center text-center flex mobile:text-[14px] mobile:leading-[20px] text-gray-400">
+            No oath has been sworn yet
+          </p>
+        )}
       </div>
-      <div className="flex flex-col gap-4 mt-[40px] w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%]">
+     
+     { data?.orbHashData && <div className="flex flex-col gap-4 mt-[40px] w-[40%] lgDesktop:w-[50%] smDesktop:w-[65%] tabletAir:w-[80%] mobile:w-[100%]">
         <div className="flex items-center gap-4">
           <h2 className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px]">
             Privacy
@@ -255,7 +266,7 @@ export default function Oath() {
             />
           </div>
         </div> */}
-      </div>
+      </div>}
     </section>
   );
 }

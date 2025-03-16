@@ -68,7 +68,7 @@ export default function ConnectButton() {
         starknetAccount ?
           <div
             onClick={starknetAccount ? disconnectWallet : connectWallet}
-            className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2"
+            className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 cursor-pointer mobile:text-[12px] mobile:leading-[14px]"
           >
             {starknetAccount?.account?.address.slice(0, 4)}
             ...

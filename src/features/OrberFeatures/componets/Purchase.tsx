@@ -150,13 +150,21 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
     }
   };
 
-  const { isPending, isError, data, error } = useQuery({
+  const { isPending, isError, data, error, refetch } = useQuery({
     queryKey: ['FetchPurchaseData'],
     queryFn: async () => {
       const data = await fetchData()
       return data
     },
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnReconnect: true // Refetch when reconnecting
   })
+
+  useEffect(() => {
+    refetch()
+  }, [])
 
   console.log('FetchPurchaseData', data);
 

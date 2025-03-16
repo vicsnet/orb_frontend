@@ -90,10 +90,13 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                 const res = await myWalletAccount.execute(myInvokeCall);
                 await provider.waitForTransaction(res.transaction_hash);
                 console.log('res', res.transaction_hash);
+                return res.transaction_hash;
              
             }
         } catch (error) {
             console.error('error', error);
+            toast.error('Error creating Orb');
+            return null;
 
         }
 
@@ -176,12 +179,19 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                     const firstHalf = ipfsHash.slice(0, halfLength);
                     const secondHalf = ipfsHash.slice(halfLength);
 
-                    uploadDataToContract(firstHalf, secondHalf);
-                    toast.success('Orb Created Successfully');
-                    setIsLoading(false);
-                    setOpenCreateOrb(false);
+                    const dataHash = await uploadDataToContract(firstHalf, secondHalf);
+                    if(dataHash !== null){
+                        toast.success('Orb Created Successfully');
+                        setIsLoading(false);
+                        setOpenCreateOrb(false);
+                    }
+                    if(dataHash === null){
+                        toast.error('Error creating Orb');
+                        setIsLoading(false);
+                    }
                 }
             }
+           
             
 
         } catch (error) {
@@ -190,7 +200,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
             setIsLoading(false);
         }
 
-
+     
     }
 
     // const mutation = useMutation({

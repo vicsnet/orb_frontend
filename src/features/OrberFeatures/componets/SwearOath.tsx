@@ -118,12 +118,13 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
         const date = new Date(time);
         // setOpenOath
         const epochTime = date.getTime() / 1000;
+        const convertedDays = days * 24 * 60 * 60 * 1000;
 
         contractCall.connect(myWalletAccount);
         const myInvokeCall = contractCall.populate("swear_oath", [
           dataContent,
           cairo.uint256(epochTime),
-          cairo.uint256(days),
+          cairo.uint256(convertedDays),
         ]);
 
         const resToken = await myWalletAccount.execute(myInvokeCall);

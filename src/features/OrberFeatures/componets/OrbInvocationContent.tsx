@@ -9,7 +9,7 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
 import { ByteArray, byteArray, cairo, Contract, hash, num, RpcProvider, uint256, Uint256, WalletAccount, } from 'starknet';
 import RespondQuestion from './RespondQuestion';
 // import {StarknetWalletProvider} from 'get-starknet'
-import { useMainSectionStore, useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
+import { createLoading, useMainSectionStore, useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet"
 import { useQuery } from '@tanstack/react-query';
 import { TbArrowAutofitContent } from "react-icons/tb";
 import Loading from '@/components/Loading';
@@ -26,7 +26,9 @@ interface EMITTED_EVENT {
 }
 export default function OrbInvocationContent() {
     const { starknetAccount } = useWalletStore()
-   const { setOpenRespond, setContentId } = useMainSectionStore()
+   const { setOpenRespond, setContentId } = useMainSectionStore();
+   const { setLoading } = createLoading();
+   
 
     // const starknetAccount2 = useAppSelector(
     //     (state) => state?.walletReducer?.starknetAccount
@@ -57,7 +59,7 @@ export default function OrbInvocationContent() {
             chunk_size: 10,
         });
 
-
+       
         // const uint256Value: Uint256 = { low: eventsList.events[0].data[0], high: eventsList.events[0].data[1] };
         // const result = uint256.uint256ToBN(uint256Value);
 
@@ -117,10 +119,14 @@ export default function OrbInvocationContent() {
             console.log('invocId2', Number(invocId2))
 
             // return 1 === Number(invocId2) && match;
+           
+            
             return match;
         });
 
         // setRespData(filterResponse);
+
+        
 
         console.log('filterResponse', filterResponse);
         return ({ contentData: filteredData, respData: filterResponse })
@@ -133,13 +139,13 @@ export default function OrbInvocationContent() {
     }
 
     const LikeContent = async (id: number) => {
-
+        setLoading(true);
         const myFrontendProviderUrl =
             "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
         try {
-            const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
-            const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+            // const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
+            const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
             if (address !== null) {
 
                 const { abi: testAbi } = await provider.getClassAt(address);
@@ -150,6 +156,8 @@ export default function OrbInvocationContent() {
                 const myOrbContractCall = new Contract(testAbi, address, provider);
                 const buyerAddress = starknetAccount?.account.address;
                 const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
+                console.log('myOrbId', myOrbId);
+                
 
                 const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
 
@@ -158,6 +166,7 @@ export default function OrbInvocationContent() {
                     return;
                     
                 }
+
                 const myWalletAccount = new WalletAccount(
                     { nodeUrl: myFrontendProviderUrl },
                     starknetAccount as any
@@ -178,6 +187,12 @@ export default function OrbInvocationContent() {
                 const resToken = await myWalletAccount.execute(myInvokeCall);
                 await provider.waitForTransaction(resToken.transaction_hash);
                 console.log("resToken", resToken.transaction_hash);
+                const resTokenHash = resToken.transaction_hash;
+                if(resTokenHash){
+                    toast.success('Liked Successfully');
+                    setLoading(false);
+                    return resTokenHash;
+                }
             }
 
 
@@ -185,6 +200,8 @@ export default function OrbInvocationContent() {
 
         } catch (error) {
             console.error("like error", error);
+            toast.error('Error Occured');
+            setLoading(false);
         }
 
 
@@ -194,13 +211,13 @@ export default function OrbInvocationContent() {
     }
 
     const disLikeContent = async (id: number) => {
-
+        setLoading(true);
         const myFrontendProviderUrl =
             "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
         try {
-            const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
-            const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+            // const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
+            const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
             if (address !== null) {
 
                 const { abi: testAbi } = await provider.getClassAt(address);
@@ -227,7 +244,6 @@ export default function OrbInvocationContent() {
 
                 contractCall.connect(myWalletAccount);
                 const myInvokeCall = contractCall.populate("flag_response", [
-
                     address,
                     cairo.uint256(Number(id)),
                     cairo.uint256(Number(myOrbId)),
@@ -236,13 +252,19 @@ export default function OrbInvocationContent() {
                 const resToken = await myWalletAccount.execute(myInvokeCall);
                 await provider.waitForTransaction(resToken.transaction_hash);
                 console.log("resToken", resToken.transaction_hash);
+                const resTokenHash = resToken.transaction_hash;
+                if(resTokenHash){
+                    toast.success('Disliked Successfully');
+                    setLoading(false);
+                    return resTokenHash;
+                }
             }
-
-
 
 
         } catch (error) {
             console.error(error);
+            toast.error('Error Occured');
+            setLoading(false);
         }
 
 
@@ -251,24 +273,35 @@ export default function OrbInvocationContent() {
 
     }
 
-    const { isPending, isError, data, error } = useQuery({
+    const { isPending, isError, data, error, refetch } = useQuery({
         queryKey: ['FetchInvocation'],
         queryFn: async () => {
             const data = await getInvocation()
             return data
         },
-    })
+        refetchInterval: 5000, // Refetch every 5 seconds
+        refetchOnWindowFocus: true, // Refetch when window regains focus
+        refetchOnMount: true, // Refetch when component mounts
+        refetchOnReconnect: true // Refetch when reconnecting
+      })
 
-    console.log('invocation data', data);
+    // console.log('invocation data', data);
    
 
-    // useEffect(() => {
-    //     getInvocation()
-    // }, [])
+    useEffect(() => {
+        refetch()
+    }, [])
 
     return (
         <div className="relative">
-            
+            {isPending && (
+                <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
+                    <Loading />
+                    <p className="text-[16px] font-bold tracking-[0.15px] text-gray-400 italic mt-4">
+                        Loading invocations...
+                    </p>
+                </div>
+            )}
             {data?.contentData.length === 0 && 
             <div className="flex flex-col justify-center items-center w-[500px] h-[300px] mx-auto mt-2 rounded-lg mobile:w-[300px] mobile:h-[200px] mobile:mt-10" style={{ background: 'linear-gradient(111deg, rgba(255, 255, 255, 0.16) -1.65%, rgba(255, 255, 255, 0.12) 100%)' }}>
             <TbArrowAutofitContent className='text-[#99E515] text-[120px] font-bold  tracking-[0.15px] mobile:text-[60px]' />

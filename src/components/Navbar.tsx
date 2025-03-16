@@ -19,7 +19,7 @@ export default function Navbar({ title, setOpenCreateOrb, openCreateOrb }: Navba
             <>
               <button 
                 onClick={() => setOpenCreateOrb && setOpenCreateOrb(true)} 
-                className='font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 mobile:text-[12px] mobile:leading-[14px]'
+                className='font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 mobile:text-[12px] mobile:leading-[14px] cursor-pointer'
               > 
                 Create your own Orb
               </button>

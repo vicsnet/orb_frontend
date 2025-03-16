@@ -11,7 +11,7 @@ type OrbHeroProps = {
 };
 
 export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
-    const { name, address } = useOrbDetailsStore();
+    const { name, address, description  } = useOrbDetailsStore();
     // const orbDetail = useAppSelector((state) => state?.OrbDetailsReducer?.OrbAccountDetails)
     // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
 
@@ -44,19 +44,24 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
 
     }
 
-    const { isPending, isError, data, error } = useQuery({
+    const { isPending, isError, data, error, refetch } = useQuery({
         queryKey: ['FetchAllAdresses'],
         queryFn: async () => {
           const data = await getCoolDown()
           return data
         },
+        refetchInterval: 5000, // Refetch every 5 seconds
+        refetchOnWindowFocus: true, // Refetch when window regains focus
+        refetchOnMount: true, // Refetch when component mounts
+        refetchOnReconnect: true // Refetch when reconnecting
       })
-console.log('dataCooldown',data?.cooldown);
+// console.log('dataCooldown',data?.cooldown);
 
 
-    // useEffect(() => {
-    //     getCoolDown()
-    // }, [])
+    useEffect(() => {
+        // getCoolDown()
+        refetch()
+    }, [])
     
     return (
         <section className='w-[90%] mx-auto'>
@@ -64,9 +69,13 @@ console.log('dataCooldown',data?.cooldown);
                 <h2 className="text-[44px] font-bold leading-[52.8px] -tracking-[0.50px] text-[#FFFFFF] mt-[140px] tabletAir:mt-[100px] mobile:mt-[70px] mobile:text-[24px]">
                     About the Orb
                 </h2>
-
+                {!description && (
+                    <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px] mt-[20px] text-justify text-gray-400 italic">
+                        No description available
+                    </p>
+                )}
                 <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px] mt-[20px] text-justify">
-                    Up until now, much of the NFT space has concerned itself primarily with art, pictures, jpegs and galleries. Orbs are different. Orbs are usable 1-of-1 NFTs that belong in inventories, not in galleries. They are for usage, not display. Conceptually, an Orb is a precious item that belongs in your magic item bag. Technically, the Orb is a modified ERC-721 on Ethereum that manages ownership functions through auctions and fractional ownership.
+                    {description}
                 </p>
 
                 <div className="flex flex-col gap-4 mt-[40px]">

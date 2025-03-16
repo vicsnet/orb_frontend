@@ -10,7 +10,7 @@ export default function HomeFeatures() {
   const[openCreateOrb, setOpenCreateOrb] = useState(false)
   
   return (
-    <main className='h-screen overflow-hidden overflow-y-scroll'>
+    <main className='h-screen overflow-hidden overflow-y-scroll '>
         <Navbar title="Orb Space" setOpenCreateOrb={setOpenCreateOrb} openCreateOrb={openCreateOrb}/>
         <HeroSection />
         <CreatorsContent />

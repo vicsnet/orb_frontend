@@ -69,14 +69,13 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
               address,
               myWalletAccount
             );
-
+            const newCooldownPeriod = Number(cooldownPeriod) * 24 * 60 * 60 ;
+            const newFlaggingPeriod = Number(flaggingperiod) * 24 * 60 * 60;
             contractCall.connect(myWalletAccount);
 
             const myCall = contractCall.populate("set_cool_down", [
-
-              cairo.uint256(Number(cooldownPeriod)),
-
-              cairo.uint256(Number(flaggingperiod)),
+              cairo.uint256(newCooldownPeriod),
+              cairo.uint256(newFlaggingPeriod),
             ]);
 
             const res = await myWalletAccount.execute(myCall);
@@ -98,9 +97,7 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
 
   };
 
-  useEffect(() => {
-    // fetchData();
-  }, []);
+
 
   return (
     <main className="w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar">

@@ -23,31 +23,35 @@ type OrbHeroProps = {
 
 export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays, setIsLoading }: OrbHeroProps) {
 
-  const { setOrbPrice, price } = useOrbprice()
-  const { starknetAccount } = useWalletStore()
+  const { setOrbPrice, price } = useOrbprice();
+  const { starknetAccount } = useWalletStore();
 
-  const { address, description } = useOrbDetailsStore()
+  const { address, description } = useOrbDetailsStore();
 
-  const [myOrbprice, setMyOrbPrice] = useState<any>(0);
-  const [orbStatus, setOrbStatus] = useState<boolean>(false);
+  // const [myOrbprice, setMyOrbPrice] = useState<any>(0);
+  // const [orbStatus, setOrbStatus] = useState<boolean>(false);
   const [totalFracOrb, setTotalFracOrb] = useState<any>(0);
   const [AddressFrac, setAddressFrac] = useState<any>(0);
-  const [orbEndDate, setOrbEndDate] = useState("");
-  const [orbToken, setOrbToken] = useState<any>(0);
-  const [oathHash, setOathHash] = useState<string>("")
+  // const [orbEndDate, setOrbEndDate] = useState("");
+  // const [orbToken, setOrbToken] = useState<any>(0);
+  // const [oathHash, setOathHash] = useState<string>("")
   const decimal: number = 1000000000000000000;
 
   const fetchData = async () => {
     try {
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+      console.log('reloadaddress', address);
+      
 
       if (address !== null) {
-        console.log('contract', address);
+        // console.log('contract', address);
 
         const { abi: testAbi } = await provider.getClassAt(address);
 
         if (testAbi === undefined) {
+          toast.error("no abi.");
           throw new Error("no abi.");
+    
         }
 
         const myContractCall = new Contract(testAbi, address, provider);
@@ -56,6 +60,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         // setMyOrbPrice(priceHash.toString());
 
         setOrbPrice(priceHash.toString());
+        
+        
 
         const oathHash = await myContractCall.get_oathHash();
         // setOathHash(oathHash);
@@ -137,22 +143,26 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     }
   }
 
-  const { isPending, isError, data, error, isFetching } = useQuery({
+  const { isPending, isError, data, error, isFetching, refetch } = useQuery({
     queryKey: ['FetchHeroData'],
     queryFn: async () => {
       const data = await fetchData()
-      return data
+      return data// Return empty object if data is null/undefined
     },
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnReconnect: true // Refetch when reconnecting
   })
 
-  console.log('daraaa', data);
-  console.log('daraaa3', data?.orbToken);
+  // console.log('daraaa', data);
+  // console.log('daraaa3', data?.orbToken);
 
-  // useEffect(() => {
-  //   fetchData();
-  //   // console.log('orbToken', orbToken);
+  useEffect(() => {
+   refetch()
+    // console.log('orbToken', orbToken);
 
-  // }, []);
+  }, []);
   return (
     <section className="w-[96%] mx-auto mt-[100px] mobile:mt-[50px] relative">
       <div
@@ -164,6 +174,15 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
       >
         {/* orb status */}
         <div className="">
+          {isPending ? (
+            <div className="flex flex-col justify-center items-center h-[300px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#99E515]"></div>
+              <p className="text-[16px] font-bold tracking-[0.15px] text-gray-400 italic mt-4">
+                Loading orb details...
+              </p>
+            </div>
+          ) : (
+          <>
           {/* status */}
           <h2 className="text-[20px] font-bold leading-[26px] tracking-[0.15px] capitalize text-white text-center pt-[16px]">
            
@@ -190,7 +209,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             </h2>
             <p className="text-white font-bold leading-[32.016px] text-center">
             
-                {Number(data?.myOrbprice) / decimal} Strk
+                {(Number(data?.myOrbprice) / decimal).toFixed(2)} Strk
            
             </p>
           </div>
@@ -307,7 +326,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               </div>
             </>
           )}
-         
+          </>
+          )}
         </div>
         {/* orb status */}
       </div>

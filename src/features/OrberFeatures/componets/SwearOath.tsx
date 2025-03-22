@@ -167,7 +167,7 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
 
           <div className=" mt-9 mb-9 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
             <div className="">
-              <textarea name="" id="" rows={10} placeholder='Oath' className='w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors' onChange={(e) => setContent(e.target.value)}></textarea>
+              <textarea name="" id="" rows={10} placeholder='I, Orbspace, swear to honor my Orb as long as I am able, or until it is retired. I shall answer any permissible question dutifully to the best of my abilities – as long as answering does not bring me into conflict with the law or my ethical code, or compromise myself or others.' className='w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors' onChange={(e) => setContent(e.target.value)}></textarea>
             </div>
 
             <div className="mt-4">

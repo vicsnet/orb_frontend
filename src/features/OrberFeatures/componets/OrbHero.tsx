@@ -217,7 +217,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
           <div className=" w-[90%] mx-auto flex justify-center flex-col">
             <p className="font-bold text-[20px] leading-[26px] tracking-[0.15px] text-center">
              
-              {data?.orbStatus && data?.orbEndDate > currentDate() && description}
+              {data?.orbStatus && data?.orbEndDate > currentDate() &&  description && description.length > 201 ? description.slice(0, 201) + ' ...' : description}
               {data?.orbStatus &&
                 data?.orbEndDate < currentDate() &&
                 "And now his watch has ended. Orb is over, and no further activity will happen. Thank you to everyone who participated."}
@@ -246,7 +246,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
          
             {data?.oathHash === "" && (
               <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenOath(true)}
               >
                 Swear Oath
@@ -256,7 +256,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
            {/* set cooldown period */}
 
             {cooldownDays === 0 && <button
-              className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
+              className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
               onClick={() => setOpenCooldown(true)}
             >
               Set Cooldown Period
@@ -265,7 +265,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             {/* set price */}
             {Number(price) === 0 &&
               <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                 onClick={() => setOpenPrice(true)}
               >
                 Set Price
@@ -276,7 +276,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             {
               !data?.orbStatus &&
               <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
+                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                 onClick={() => startMyOrb()}
               >
                 Start Orb
@@ -289,7 +289,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             <div className="flex justify-center">
               {data?.orbStatus && (
                 <button
-                  className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
+                  className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
                   onClick={() => setOpenPurchase(true)}
                 >
                   Purchase a fraction

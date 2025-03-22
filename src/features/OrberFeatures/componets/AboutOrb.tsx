@@ -75,7 +75,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                     </p>
                 )}
                 <p className="text-[16px] font-bold leading-[22px] tracking-[0.15px] mobile:text-[14px] mobile:leading-[20px] mt-[20px] text-justify">
-                    {description}
+                   {description}
                 </p>
 
                 <div className="flex flex-col gap-4 mt-[40px]">
@@ -84,7 +84,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                         <p className="mobile:hidden">..................................................................................</p>
                         <p className="hidden mobile:block">.............................</p>
 
-                        <div className="flex items-center">
+                        <div className="flex items-center cursor-pointer" onClick={() => window.open(`https://twitter.com/${name}`, '_blank')}>
                             <p className="text-[14px] font-bold tracking-[0.46px] underline">{name}</p>
                             <Image src='/images/Group.svg' alt={ name !== null && name !== undefined ? name : 'orb creator'} width={16} height={16} />
                         </div>
@@ -105,7 +105,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                         <p className="hidden mobile:block">.............................................</p>
 
                         <div className="flex items-center">
-                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{data?.cooldown} Days</p>
+                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{Number(data?.cooldown) / 86400} Days</p>
 
                         </div>
                     </div>

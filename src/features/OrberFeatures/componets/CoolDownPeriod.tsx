@@ -118,11 +118,11 @@ export default function CoolDownPeriod({ setOpenCooldown }: OrbHeroProps) {
           <div className="w-[90%]  mt-9 mb-9 items-center bg-[#303033] py-[15px] px-[20px] gap-8 rounded-lg mx-auto">
 
             <div className="">
-              <input type="number" placeholder="Cooldown Period" className="w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors" onChange={(e) => setCooldownPeriod(Number(e.target.value))} />
+              <input type="number" placeholder="Cooldown Period in Days" className="w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors" onChange={(e) => setCooldownPeriod(Number(e.target.value))} />
             </div>
 
             <div className="mt-4">
-              <input type="number" placeholder="Flagging Period" className="w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors" onChange={(e) => setFlaggingPeriod(Number(e.target.value))} />
+              <input type="number" placeholder="Flagging Period in Days" className="w-[100%] bg-transparent border border-[#DCDEE0] rounded-lg p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-colors" onChange={(e) => setFlaggingPeriod(Number(e.target.value))} />
             </div>
           </div>
 

@@ -43,6 +43,8 @@ export default function OrberFeatures() {
           />
         </div>
         <div className="absolute top-0 w-[100%]">
+
+
           <Navbar title={`${name}'s Orb`} />
 
           <div className="">

@@ -220,18 +220,19 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
                 <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[100px] overflow-y-scroll  no-scrollbar h-[60vh]">
                     <div className=" mx-auto w-[90%] pt-4 pb-4">
-                        <div className="flex justify-between">
-                            <h2 className="text-[20px] leading-8 text-[#FFFFFF]">
+                        <div className="flex justify-between items-center pb-4">
+                            <h2 className="text-[20px] leading-8 text-[#FFFFFF] whitespace-nowrap">
                                 Create your Orb
                             </h2>
                             <span className="">
                                 <MdClose
                                     size={24}
-                                    className="text-[#FFFFFF]"
+                                    className="text-[#FFFFFF] cursor-pointer"
                                     onClick={() => setOpenCreateOrb(false)}
                                 />
                             </span>
                         </div>
+                      <div className="h-[55vh] overflow-y-scroll no-scrollbar">
                         <div className=" mt-9 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
                             <input type="text" placeholder="Name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setName(e.target.value)} />
                         </div>
@@ -305,6 +306,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                                 Create Orb
                             </div>
                        
+                        </div>
                         </div>
                     </div>
                 </section>

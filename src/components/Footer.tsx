@@ -53,7 +53,11 @@ export default function Footer({ setOpenCreateOrb }: OrbFooterProps) {
             </div>
             :
             // {/* Orber section */}
-            <div className="flex justify-center mt-[40px]">
+            <div className="flex ju
+            
+            
+            
+            stify-center mt-[40px]">
               <button className='flex gap-2 items-center'>
                 <p className="text-[14px] font-bold leading-[26px] tracking-[0.46px] text-[#99E515]">
                   <a href={`https://sepolia.voyager.online/contract/${address}`}>

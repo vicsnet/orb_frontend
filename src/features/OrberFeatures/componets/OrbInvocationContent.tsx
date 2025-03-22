@@ -289,7 +289,7 @@ export default function OrbInvocationContent() {
    
 
     useEffect(() => {
-        // refetch()
+        refetch()
     }, [])
 
     return (

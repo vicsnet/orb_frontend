@@ -49,12 +49,12 @@ export default function SwearOath({ title, setOpenOath }: invokePros) {
         Exclusivity: "Keepers can read past Q&A and reveal their own",
         swornDate: currentDate,
         questions: [{
-          "title": "What function does Domain's Orb have?",
-          "content": "Different Orbs have different functions. Domain's Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+          "title": `What function does ${title}'s Orb have?`,
+          "content": `Different Orbs have different functions. ${title}'s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the starknet blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of ${days} days.`
         },
         {
           "title": "Who is a Keeper?",
-          "content": "Different Orbs have different functions. Vincent’s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to Nic and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the Ethereum blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of 7 days."
+          "content": `Different Orbs have different functions. ${title}'s Orb is a basic Q&A-type Orb. The Keeper (holder) has the right to submit a text-based question to ${title} and the right to receive a text-based response. The question is limited to 1000 characters but responses may come in any length. Questions and answers are hash-committed to the starknet blockchain so that the track record of how the creator responds cannot be changed. The Orb has a cooldown of ${days} days.`
         },
         {
           "title": "Who is the Orb for?",

@@ -11,7 +11,7 @@ type OrbHeroProps = {
 };
 
 export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
-    const { name, address, description  } = useOrbDetailsStore();
+    const { name, address, description, x_account  } = useOrbDetailsStore();
     // const orbDetail = useAppSelector((state) => state?.OrbDetailsReducer?.OrbAccountDetails)
     // const contract = useAppSelector((state) => state?.OrbDetailsReducer?.address);
 
@@ -84,7 +84,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
                         <p className="mobile:hidden">..................................................................................</p>
                         <p className="hidden mobile:block">.............................</p>
 
-                        <div className="flex items-center cursor-pointer" onClick={() => window.open(`https://twitter.com/${name}`, '_blank')}>
+                        <div className="flex items-center cursor-pointer" onClick={() => window.open(`https://x.com/${x_account}`, '_blank')}>
                             <p className="text-[14px] font-bold tracking-[0.46px] underline">{name}</p>
                             <Image src='/images/Group.svg' alt={ name !== null && name !== undefined ? name : 'orb creator'} width={16} height={16} />
                         </div>

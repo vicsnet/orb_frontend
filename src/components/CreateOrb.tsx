@@ -218,7 +218,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
             <div className="w-[100%] h-screen bg-[#000000]">
                 <Navbar title="Orb Space" setOpenCreateOrb={() => setOpenCreateOrb(false)} openCreateOrb={true} />
 
-                <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[100px] overflow-y-scroll  no-scrollbar h-[60vh]">
+                <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[100px] overflow-y-hidden  no-scrollbar h-[62vh] ">
                     <div className=" mx-auto w-[90%] pt-4 pb-4">
                         <div className="flex justify-between items-center pb-4">
                             <h2 className="text-[20px] leading-8 text-[#FFFFFF] whitespace-nowrap">

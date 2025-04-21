@@ -44,13 +44,13 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
     const { starknetAccount } = useWalletStore();
 
-    
 
+    const { setOrbDetailsData } = useOrbDetailsStore()
 
     const uploadDataToContract = async (tokenURI1: string, tokenURI2: string) => {
         try {
 
-            
+
 
             const myFrontendProviderUrl =
                 "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
@@ -90,13 +90,45 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                 const res = await myWalletAccount.execute(myInvokeCall);
                 await provider.waitForTransaction(res.transaction_hash);
                 console.log('res', res.transaction_hash);
-                return res.transaction_hash;
-             
+                const txReceipt = await provider.getTransactionReceipt(res.transaction_hash);
+                let address;
+                if (txReceipt.isSuccess()) {
+
+
+                    const events = contractCall.parseEvents(txReceipt);
+                  
+
+                    //new
+                    const orbCreatedEvent = events.find((event) =>
+                        Object.keys(event).includes("orbland::orb_pond::ORB_pond::OrbCreated")
+                    );
+
+                    if (orbCreatedEvent) {
+                        const eventData = orbCreatedEvent["orbland::orb_pond::ORB_pond::OrbCreated"];
+
+
+                        const contractDecimal = eventData.contract_address;
+
+                        console.log('contractDecimal', contractDecimal);
+                        if (contractDecimal) {
+                            const contractHex = "0x" + contractDecimal.toString(16).padStart(64, '0');
+                            console.log("✅ Contract Address (Hex):", contractHex);
+                            address = contractHex;
+                            
+                        }
+                    }
+                    // return orbAddres
+                   
+                }
+
+
+                return { transactionHash: res.transaction_hash, address };
+
             }
         } catch (error) {
             console.error('error', error);
-            toast.error('Error creating Orb');
-            return null;
+            // toast.error('Error creating Orb');
+            return { transactionHash:null, address:null };
 
         }
 
@@ -104,23 +136,48 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
     const createOrb = async () => {
         setIsLoading(true);
-        if(!starknetAccount?.account?.address){
+        if (!starknetAccount?.account?.address) {
             toast.error('Please connect your wallet');
             setIsLoading(false);
             return;
         }
-        if(name === '' || symbol === '' || totalSupply === 0 || description === '' || xAccount === '' || farcaster === '' || creatorName === '' || file === null){
-            toast.error('All fields are required');
+        if (name === '') {
+            toast.error('Name field required');
             setIsLoading(false);
             return;
         }
-        if(totalSupply >5){
+        if (symbol === '') {
+            toast.error('Symbol field required');
+            setIsLoading(false);
+            return;
+        }
+        if (totalSupply === 0) {
+            toast.error('Total supply field required');
+            setIsLoading(false);
+            return;
+        }
+        if (description === '') {
+            toast.error('Description field required');
+            setIsLoading(false);
+            return;
+        }
+        if (xAccount === '') {
+            toast.error('X account field required');
+            setIsLoading(false);
+            return;
+        }
+        if (file === null) {
+            toast.error('File field required');
+            setIsLoading(false);
+            return;
+        }
+        if (totalSupply > 5) {
             toast.error('Total supply must be less than 5');
             setIsLoading(false);
             return;
         }
-        
-        
+
+
         const JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyYTBjNjg3MS04NGIxLTRlMDgtODg2ZC1iYmU5ODY5ZDQ4OWMiLCJlbWFpbCI6InZpbmNlLmFkZXNhbm1pMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZWQ2MGI4MzZiNGI3M2Q3OGU5NmYiLCJzY29wZWRLZXlTZWNyZXQiOiI2N2FjNWNmZTBhODIzYWEyYzA1ZDA5MDNhMDRiZWQ5YjM1MzllMDVkODkxZWMwNTRiYjM2OTBkMDUyMDdjN2NhIiwiZXhwIjoxNzcwMTEyODA3fQ.5zF5vDwlY_RHXz4lkckjovm1xbFxowIbqZvDf69QD0Y";
 
 
@@ -179,20 +236,34 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                     const firstHalf = ipfsHash.slice(0, halfLength);
                     const secondHalf = ipfsHash.slice(halfLength);
 
-                    const dataHash = await uploadDataToContract(firstHalf, secondHalf);
-                    if(dataHash !== null){
-                        toast.success('Orb Created Successfully');
-                        setIsLoading(false);
-                        setOpenCreateOrb(false);
+                    const result = await uploadDataToContract(firstHalf, secondHalf);
+                    console.log('result', result);
+                    
+                    if (result?.transactionHash !== null) {
+                        setOrbDetailsData({
+                            name: data.name,
+                            description: data.description,
+                            image: data.image,
+                            creator: data.creator,
+                            x_account: data.x_account,
+                            farcaster: data.farcaster,
+                            address: result?.address || ''
+                          })
+
+                          toast.success('Orb Created Successfully');
+                          setIsLoading(false);
+                        window.location.href = `/${result?.address}?orb=${data.name}`;
+                        // setOpenCreateOrb(false);
+                        
                     }
-                    if(dataHash === null){
+                    if (result?.transactionHash === null) {
                         toast.error('Error creating Orb');
                         setIsLoading(false);
                     }
                 }
             }
-           
-            
+
+
 
         } catch (error) {
             console.error('error', error);
@@ -200,7 +271,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
             setIsLoading(false);
         }
 
-     
+
     }
 
     // const mutation = useMutation({
@@ -232,89 +303,89 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                                 />
                             </span>
                         </div>
-                      <div className="h-[55vh] overflow-y-scroll no-scrollbar">
-                        <div className=" mt-9 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="text" placeholder="Name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="text" placeholder="NFT Symbol" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setSymbol(e.target.value)} />
-                        </div>
-                        <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="number" placeholder="Total Supply" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setTotalSupply(Number(e.target.value))} />
-                        </div>
+                        <div className="h-[55vh] overflow-y-scroll no-scrollbar">
+                            <div className=" mt-9 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="text" placeholder="Name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setName(e.target.value)} />
+                            </div>
+                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="text" placeholder="NFT Symbol" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setSymbol(e.target.value)} />
+                            </div>
+                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="number" placeholder="Total Supply" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setTotalSupply(Number(e.target.value))} />
+                            </div>
 
 
-                        <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="text" placeholder="ORB Description" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setDescription(e.target.value)} />
+                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="text" placeholder="ORB Description" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setDescription(e.target.value)} />
 
-                        </div>
-                        <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="text" placeholder="X Account" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setXAccount(e.target.value)} />
+                            </div>
+                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="text" placeholder="X Account" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setXAccount(e.target.value)} />
 
-                        </div>
-                        <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="text" placeholder="Farcaster Account" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setFarcaster(e.target.value)} />
+                            </div>
+                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="text" placeholder="Farcaster Account" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setFarcaster(e.target.value)} />
 
-                        </div>
-                        <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                            <input type="text" placeholder="Creator name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setCreatorName(e.target.value)} />
+                            </div>
+                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
+                                <input type="text" placeholder="Creator name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setCreatorName(e.target.value)} />
 
-                        </div>
-                        <div className="mt-4 relative">
-                            <input
-                                type="file"
-                                className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
-                                onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                        setFile(e.target.files[0])
-                                    }
-                                }}
-                            />
-                            <div className="bg-[#303033] py-[15px] px-[20px] rounded-lg border-2 border-dashed border-[#99E515] hover:border-[#7ab811] transition-colors">
-                                <div className="flex items-center justify-center flex-col">
-                                    <svg className="w-8 h-8 mb-2 text-[#99E515]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                    </svg>
-                                    {file ? (
-                                        <p className="text-sm text-[#FFFFFF]">
-                                            <span className="font-semibold">{file.name}</span>
-                                        </p>
-                                    ) : (
-                                        <>
+                            </div>
+                            <div className="mt-4 relative">
+                                <input
+                                    type="file"
+                                    className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                            setFile(e.target.files[0])
+                                        }
+                                    }}
+                                />
+                                <div className="bg-[#303033] py-[15px] px-[20px] rounded-lg border-2 border-dashed border-[#99E515] hover:border-[#7ab811] transition-colors">
+                                    <div className="flex items-center justify-center flex-col">
+                                        <svg className="w-8 h-8 mb-2 text-[#99E515]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                        {file ? (
                                             <p className="text-sm text-[#FFFFFF]">
-                                                <span className="font-semibold">Click to upload Orb Image</span> or drag and drop
+                                                <span className="font-semibold">{file.name}</span>
                                             </p>
-                                            <p className="text-xs text-gray-400">
-                                                PNG, JPG, GIF up to 10MB
-                                            </p>
-                                        </>
-                                    )}
+                                        ) : (
+                                            <>
+                                                <p className="text-sm text-[#FFFFFF]">
+                                                    <span className="font-semibold">Click to upload Orb Image</span> or drag and drop
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    PNG, JPG, GIF up to 10MB
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
 
 
-                        <div className="mt-9 mb-4 ">
-                           
-                            
-                            <div
-                                className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center cursor-pointer"
-                                onClick={() => createOrb()}
-                            >
-                              
-                                Create Orb
+                            <div className="mt-9 mb-4 ">
+
+
+                                <div
+                                    className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 flex items-center justify-center cursor-pointer"
+                                    onClick={() => createOrb()}
+                                >
+
+                                    Create Orb
+                                </div>
+
                             </div>
-                       
-                        </div>
                         </div>
                     </div>
                 </section>
             </div>
             {/* loading */}
             {isLoading && <Loading />}
-            
-            
+
+
         </main>
     );
 }

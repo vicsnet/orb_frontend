@@ -216,8 +216,12 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
 
           <div className=" w-[90%] mx-auto flex justify-center flex-col">
             <p className="font-bold text-[20px] leading-[26px] tracking-[0.15px] text-center">
-             
-              {data?.orbStatus && data?.orbEndDate > currentDate() &&  description && description.length > 201 ? description.slice(0, 201) + ' ...' : description}
+           
+
+              {data?.orbStatus === true && data?.orbEndDate && data?.orbEndDate > currentDate() || data?.orbEndDate && data?.orbEndDate < currentDate() && description ? (description && description.length > 201 ? description.slice(0, 201) + ' ...' : description) : description}
+
+ 
+              
               {data?.orbStatus &&
                 data?.orbEndDate < currentDate() &&
                 "And now his watch has ended. Orb is over, and no further activity will happen. Thank you to everyone who participated."}

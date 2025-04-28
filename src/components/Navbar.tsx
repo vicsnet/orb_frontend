@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation'
 import ConnectButton from './ConnectButton';
 type NavbarProps = {
   title: string;
-  setOpenCreateOrb?: React.Dispatch<React.SetStateAction<boolean>>;
-  openCreateOrb?: boolean;
+  // setOpenCreateOrb?: React.Dispatch<React.SetStateAction<boolean>>;
+  // openCreateOrb?: boolean;
 };
-export default function Navbar({ title, setOpenCreateOrb, openCreateOrb }: NavbarProps) {
+export default function Navbar({ title}: NavbarProps) {
   const pathname = usePathname();
   return (
     <section className='w-[90%] mx-auto'>
@@ -27,7 +27,7 @@ export default function Navbar({ title, setOpenCreateOrb, openCreateOrb }: Navba
       )}
       <div className={`flex justify-between pt-[64px] items-center ${pathname !== '/' ? 'pt-0' : ''}`}>
         <Logo title={title} />
-        {
+        {/* {
           pathname === '/' && !openCreateOrb ?
             <>
               <button
@@ -37,9 +37,9 @@ export default function Navbar({ title, setOpenCreateOrb, openCreateOrb }: Navba
                 Create your own Orb
               </button>
             </>
-            :
-            <ConnectButton />
-        }
+            : */}
+            <ConnectButton bg='bg-[#FFFFFF]' />
+        {/* // } */}
       </div>
     </section>
   )

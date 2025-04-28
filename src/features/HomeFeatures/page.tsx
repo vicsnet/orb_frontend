@@ -11,8 +11,8 @@ export default function HomeFeatures() {
   
   return (
     <main className='h-screen overflow-hidden overflow-y-scroll '>
-        <Navbar title="Orb Space" setOpenCreateOrb={setOpenCreateOrb} openCreateOrb={openCreateOrb}/>
-        <HeroSection />
+        <Navbar title="Orb Space" />
+        <HeroSection setOpenCreateOrb={setOpenCreateOrb} openCreateOrb={openCreateOrb}/>
         <CreatorsContent />
         <KnowMore/>
         <Footer setOpenCreateOrb={setOpenCreateOrb}/>

@@ -10,7 +10,7 @@ import { WalletAccount } from 'starknet';
 // import { walletConnect, walletDisConnect } from "@/redux/features/walletSlice";
 import { useWalletStore } from "@/zustand/Wallet";
 
-export default function ConnectButton() {
+export default function ConnectButton({bg}: {bg: string}) {
   // const dispatch = useDispatch<AppDispatch>();
   // const accountStarknet = useAppSelector((state) => state.walletReducer.starknetAccount);
   const { setStarknetAccount, setDisconnectAccount, starknetAccount } = useWalletStore()
@@ -68,7 +68,7 @@ export default function ConnectButton() {
         starknetAccount ?
           <div
             onClick={starknetAccount ? disconnectWallet : connectWallet}
-            className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 cursor-pointer mobile:text-[12px] mobile:leading-[14px]"
+            className={`font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] ${bg} rounded-md p-2 cursor-pointer mobile:text-[12px] mobile:leading-[14px]`}
           >
             {starknetAccount?.account?.address.slice(0, 4)}
             ...
@@ -77,7 +77,7 @@ export default function ConnectButton() {
           :
           <div
             onClick={connectWallet}
-            className=" font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 cursor-pointer mobile:text-[12px] mobile:leading-[14px]"
+            className={`font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] ${bg} rounded-md p-2 cursor-pointer mobile:text-[12px] mobile:leading-[14px]`}
           >
             Connect Wallet
           </div>

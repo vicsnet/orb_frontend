@@ -11,7 +11,7 @@ type NavbarProps = {
 export default function Navbar({ title}: NavbarProps) {
   const pathname = usePathname();
   return (
-    <section className='w-[90%] mx-auto'>
+    <section className='w-[90%] mx-auto mt-12'>
       {pathname !== '/' && (
       <div className="flex items-center gap-4 pl-0 pr-4 py-2 text-[12px]">
         <button
@@ -25,21 +25,11 @@ export default function Navbar({ title}: NavbarProps) {
         </button>
       </div>
       )}
-      <div className={`flex justify-between pt-[64px] items-center ${pathname !== '/' ? 'pt-0' : ''}`}>
+      <div className={`flex justify-between items-center`}>
         <Logo title={title} />
-        {/* {
-          pathname === '/' && !openCreateOrb ?
-            <>
-              <button
-                onClick={() => setOpenCreateOrb && setOpenCreateOrb(true)}
-                className='font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 mobile:text-[12px] mobile:leading-[14px] cursor-pointer'
-              >
-                Create your own Orb
-              </button>
-            </>
-            : */}
+      
             <ConnectButton bg='bg-[#FFFFFF]' />
-        {/* // } */}
+      
       </div>
     </section>
   )

@@ -1,13 +1,15 @@
 import { StarknetWindowObject } from 'get-starknet'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
+import { WALLET_API } from "@starknet-io/types-js";
+import { WalletAccount} from 'starknet';
 
-
-
+interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
+}
 type WalletState = {
-    starknetAccount: StarknetWindowObject | null;
+    starknetAccount: WalletAccount | null;
     error: string | null;
-    setStarknetAccount: (account: StarknetWindowObject | null) => void;
+    setStarknetAccount: (account: WalletAccount | null) => void;
     setDisconnectAccount: () => void
 };
 

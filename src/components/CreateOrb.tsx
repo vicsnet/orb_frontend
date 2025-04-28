@@ -287,12 +287,12 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
         <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
 
             <div className="w-[100%] h-screen bg-[#000000]">
-                <Navbar title="Orb Space" setOpenCreateOrb={() => setOpenCreateOrb(false)} openCreateOrb={true} />
+                <Navbar title="Orb Space"  />
 
                 <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[100px] overflow-y-hidden  no-scrollbar h-[62vh] ">
                     <div className=" mx-auto w-[90%] pt-4 pb-4">
                         <div className="flex justify-between items-center pb-4">
-                            <h2 className="text-[20px] leading-8 text-[#FFFFFF] whitespace-nowrap">
+                            <h2 className="text-[24px] leading-[133%] font-bold text-[#FFFFFF] whitespace-nowrap">
                                 Create your Orb
                             </h2>
                             <span className="">
@@ -303,32 +303,44 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                                 />
                             </span>
                         </div>
-                        <div className="h-[55vh] overflow-y-scroll no-scrollbar">
-                            <div className=" mt-9 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="text" placeholder="Name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setName(e.target.value)} />
+                        <div className="h-[55vh] overflow-y-scroll no-scrollbar noto-sans">
+                            <div className=" mt-9 flex flex-col gap-2 px-4">
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Orb Name <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <input type="text" placeholder="Enter preferred name for your Orb" className="w-[100%]  bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setName(e.target.value)} />
                             </div>
-                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="text" placeholder="NFT Symbol" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setSymbol(e.target.value)} />
+                            <div className=" mt-4 flex flex-col gap-2 px-4">
+                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">NFT Symbol <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <input type="text" placeholder="E.g ETH for Ethereum" className="w-[100%]  bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setSymbol(e.target.value)} />
                             </div>
-                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="number" placeholder="Total Supply" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setTotalSupply(Number(e.target.value))} />
+                            <div className=" mt-4 flex flex-col gap-2 px-4">
+                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Total Supply <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <input type="number" placeholder="Enter number of orb to be available" className="w-[100%]  bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setTotalSupply(Number(e.target.value))} />
+                                <p className="text-[#9EA2B3] text-[14px] leading-[20px] font-normal ">Maximum of 5</p>
                             </div>
 
 
-                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="text" placeholder="ORB Description" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setDescription(e.target.value)} />
+                            <div className=" mt-4 flex flex-col gap-2 px-4">
+                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">ORB Description <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <textarea 
+                                    placeholder="Enter what your Orb is about and what it can do" 
+                                    className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF] min-h-[100px] resize-y" 
+                                    onChange={(e) => setDescription(e.target.value)}
+                                />
 
                             </div>
-                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="text" placeholder="X Account" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setXAccount(e.target.value)} />
+                            <div className=" mt-4 flex flex-col gap-2 px-4">
+                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">X Account <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <input type="text" placeholder="Enter your X (fomerly twitter) handle" className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setXAccount(e.target.value)} />
 
                             </div>
-                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="text" placeholder="Farcaster Account" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setFarcaster(e.target.value)} />
+                            <div className=" mt-4 flex flex-col gap-2 px-4">
+                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Farcaster Account (optional) </label>
+                                <input type="text" placeholder="Enter your Farcaster username" className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setFarcaster(e.target.value)} />
 
                             </div>
-                            <div className=" mt-4 items-center bg-[#303033] py-[15px] px-[20px] mx-auto rounded-lg">
-                                <input type="text" placeholder="Creator name" className="w-[100%] bg-transparent focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-2 py-2 text-[#FFFFFF]" onChange={(e) => setCreatorName(e.target.value)} />
+                            <div className=" mt-4 flex flex-col gap-2 px-4">
+                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Creator Name <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <input type="text" placeholder="Enter your nickname" className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setCreatorName(e.target.value)} />
 
                             </div>
                             <div className="mt-4 relative">
@@ -341,7 +353,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                                         }
                                     }}
                                 />
-                                <div className="bg-[#303033] py-[15px] px-[20px] rounded-lg border-2 border-dashed border-[#99E515] hover:border-[#7ab811] transition-colors">
+                                <div className="bg-[#303033]  mx-4 py-[15px] px-[40px] rounded border-2 border-dashed border-[#99E515] hover:border-[#7ab811] transition-colors">
                                     <div className="flex items-center justify-center flex-col">
                                         <svg className="w-8 h-8 mb-2 text-[#99E515]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />

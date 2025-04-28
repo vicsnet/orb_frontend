@@ -7,7 +7,7 @@ type NavbarProps = {
   openCreateOrb?: boolean;
 };
 export default function HeroSection({setOpenCreateOrb, openCreateOrb}: NavbarProps) {
-  
+
   return (
     <section className='text-white mt-[64px]'>
       {/* content */}
@@ -17,7 +17,7 @@ export default function HeroSection({setOpenCreateOrb, openCreateOrb}: NavbarPro
         <div className="flex justify-center mt-10">
       <button
                 onClick={() => setOpenCreateOrb && setOpenCreateOrb(true)}
-                className='font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-2 mobile:text-[12px] mobile:leading-[14px] cursor-pointer '
+                className='font-bold leading-7 tracking-[0.46px] text-[rgb(18,19,18)] text-[14px] bg-[#99E515] rounded-md p-4 mobile:text-[12px] mobile:leading-[14px] cursor-pointer '
               >
                 Create your own Orb
               </button>

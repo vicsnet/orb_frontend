@@ -163,14 +163,14 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     refetchOnReconnect: true // Refetch when reconnecting
   })
 
-console.log('data', data);
-console.log('currentDate', currentDate());
+// console.log('data', data);
+// console.log('currentDate', currentDate());
 
-  useEffect(() => {
-   refetch()
-    // console.log('orbToken', orbToken);
+//   useEffect(() => {
+//    refetch()
+//     // console.log('orbToken', orbToken);
 
-  }, []);
+//   }, []);
   return (
     <section className="w-[96%] mx-auto mt-[100px] mobile:mt-[50px] relative">
       <div

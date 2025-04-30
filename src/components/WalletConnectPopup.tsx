@@ -1,7 +1,9 @@
+'use client'
 import React from 'react'
-import ConnectButton from './ConnectButton'
+import { useRouter } from 'next/navigation'
 
 export default function WalletConnectPopup() {
+  const router = useRouter()
   return (
     <main className='w-[100%] h-screen top-0 absolute backdrop-blur-sm bg-black/50 flex items-center justify-center z-50'>
         <div className="w-[400px] bg-[#1A1A1A] flex flex-col items-center justify-center p-8 smDesktop:mt-[100px] tabletAir:mt-[80px] mobile:w-[90%] border border-[#99E515] rounded-xl shadow-lg shadow-[#99E515]/20">
@@ -14,7 +16,7 @@ export default function WalletConnectPopup() {
                 <h2 className="text-[#FFFFFF] text-2xl font-bold">Orb Not Started</h2>
                 <p className="text-[#99E515] text-center text-sm leading-relaxed max-w-[280px]">This Orb has not been activated yet. </p>
                 <button 
-                    onClick={() => window.location.href = '/'}
+                    onClick={() => router.push('/')}
                     className="mt-4 px-6 py-2 bg-[#99E515] text-[#121312] font-bold rounded-md hover:bg-[#99E515]/90 transition-colors"
                 >
                     Back to Home

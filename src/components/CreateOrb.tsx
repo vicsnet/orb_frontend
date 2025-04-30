@@ -23,6 +23,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import Navbar from "./Navbar";
 import Loading from "./Loading";
+import { useRouter } from "next/navigation";
 // import { StarknetWalletProvider } from "get-starknet"
 // import { WalletAccount } from 'starknet';
 
@@ -31,6 +32,8 @@ type OrbHeroProps = {
     setOpenCreateOrb: React.Dispatch<React.SetStateAction<boolean>>;
 };
 export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
+    const router = useRouter();
+
     const [name, setName] = useState<string>('');
     const [symbol, setSymbol] = useState<string>('');
     const [totalSupply, setTotalSupply] = useState<number>(0);
@@ -255,7 +258,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
                         toast.success('Orb Created Successfully');
                         setIsLoading(false);
-                        window.location.href = `/${result?.address}?orb=${data.name}`;
+                       router.push(`/${result?.address}?orb=${data.name}`);
                         // setOpenCreateOrb(false);
 
                     }

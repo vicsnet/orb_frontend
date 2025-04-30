@@ -8,8 +8,10 @@ interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
 }
 type WalletState = {
     starknetAccount: WalletAccount | null;
+    starknet: StarknetWindowObject | null;
     error: string | null;
     setStarknetAccount: (account: WalletAccount | null) => void;
+    setStarknet: (account: StarknetWindowObject | null) => void;
     setDisconnectAccount: () => void
 };
 
@@ -53,6 +55,7 @@ export const useWalletStore = create<WalletState>()(
   persist(
     (set) => ({
         starknetAccount: null,
+        starknet: null,
         error: null,
         setStarknetAccount: (account) => set({
             starknetAccount: account,
@@ -60,6 +63,10 @@ export const useWalletStore = create<WalletState>()(
         }),
         setDisconnectAccount: () => set({
             starknetAccount: null,
+            error: null
+        }),
+        setStarknet: (account) => set({
+            starknet: account,
             error: null
         }),
     }),

@@ -83,9 +83,9 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
     try {
       if (address !== null) {
         console.log("starknetAccount", starknetAccount);
-        const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
-        const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-        const buyerAddress = starknetAccount?.account.address;
+        // const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
+        const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
+        const buyerAddress = starknetAccount?.address;
         // console.log();
 
         const { abi: testAbi } = await provider.getClassAt(address);
@@ -95,36 +95,40 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
         // const signer = starknetAccount?.account.signer;
         if (starknetAccount !== null) {
 
-          const myWalletAccount = new WalletAccount(
-            { nodeUrl: myFrontendProviderUrl },
-            starknetAccount as any
-          );
+          // const myWalletAccount = new WalletAccount(
+          //   { nodeUrl: myFrontendProviderUrl },
+          //   starknetAccount as any
+          // );
 
-          console.log(myWalletAccount, `myWalletAccount`);
+          // console.log(myWalletAccount, `myWalletAccount`);
 
           if (address !== null && starknetAccount !== null) {
             const contractCall = new Contract(
               testAbi,
               address,
-              myWalletAccount
+              starknetAccount
             );
             const tokencontractCall = new Contract(
               tokenAbi,
               tokenAddress,
-              myWalletAccount
+              starknetAccount
             );
-            tokencontractCall.connect(myWalletAccount);
+            tokencontractCall.connect(starknetAccount);
             const myTokenCall = tokencontractCall.populate("approve", [
               address,
               cairo.uint256(Number(price)),
             ]);
 
-            const resToken = await myWalletAccount.execute(myTokenCall);
+            const resToken = await starknetAccount.execute(myTokenCall);
             await provider.waitForTransaction(resToken.transaction_hash);
             console.log("resToken", resToken.transaction_hash);
-
+if(!buyerAddress){
+  toast.error('Please connect your wallet');
+  setIsLoading(false);
+  return;
+}
             if (resToken) {
-              contractCall.connect(myWalletAccount);
+              contractCall.connect(starknetAccount);
 
               const myCall = contractCall.populate("buy_orb", [
                 buyerAddress,
@@ -133,7 +137,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
                 cairo.uint256(Number(1)),
               ]);
 
-              const res = await myWalletAccount.execute(myCall);
+              const res = await starknetAccount.execute(myCall);
               await provider.waitForTransaction(res.transaction_hash);
               console.log(res.transaction_hash);
               toast.success('Purchase successful');

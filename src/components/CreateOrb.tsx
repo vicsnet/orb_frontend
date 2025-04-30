@@ -64,71 +64,74 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                 }
 
 
-                const myWalletAccount = new WalletAccount(
-                    { nodeUrl: myFrontendProviderUrl },
-                    starknetAccount as any
-                );
-                const contractCall = new Contract(
-                    testAbi,
-                    orbPondCA,
-                    myWalletAccount
-                );
-
-                contractCall.connect(myWalletAccount);
-                const tokenName = cairo.felt(name);
-                const tokenSymbol = cairo.felt(symbol);
-                const tokenTotalSupply = cairo.uint256(totalSupply);
-                const tokenuri1 = cairo.felt(tokenURI1);
-                const tokenuri2 = cairo.felt(tokenURI2);
-                const myInvokeCall = await contractCall.populate("create_orb", [
-                    tokenName,
-                    tokenSymbol,
-                    tokenuri1,
-                    tokenuri2,
-                    tokenTotalSupply,
-                ]);
-                const res = await myWalletAccount.execute(myInvokeCall);
-                await provider.waitForTransaction(res.transaction_hash);
-                console.log('res', res.transaction_hash);
-                const txReceipt = await provider.getTransactionReceipt(res.transaction_hash);
-                let address;
-                if (txReceipt.isSuccess()) {
-
-
-                    const events = contractCall.parseEvents(txReceipt);
-                  
-
-                    //new
-                    const orbCreatedEvent = events.find((event) =>
-                        Object.keys(event).includes("orbland::orb_pond::ORB_pond::OrbCreated")
+                // const myWalletAccount = new WalletAccount(
+                //     { nodeUrl: myFrontendProviderUrl },
+                //     starknetAccount as any
+                // );
+                if (starknetAccount) {
+                    const contractCall = new Contract(
+                        testAbi,
+                        orbPondCA,
+                        starknetAccount
                     );
 
-                    if (orbCreatedEvent) {
-                        const eventData = orbCreatedEvent["orbland::orb_pond::ORB_pond::OrbCreated"];
+                    contractCall.connect(starknetAccount);
+                    const tokenName = cairo.felt(name);
+                    const tokenSymbol = cairo.felt(symbol);
+                    const tokenTotalSupply = cairo.uint256(totalSupply);
+                    const tokenuri1 = cairo.felt(tokenURI1);
+                    const tokenuri2 = cairo.felt(tokenURI2);
+                    const myInvokeCall = await contractCall.populate("create_orb", [
+                        tokenName,
+                        tokenSymbol,
+                        tokenuri1,
+                        tokenuri2,
+                        tokenTotalSupply,
+                    ]);
+                    const res = await starknetAccount.execute(myInvokeCall);
+                    await provider.waitForTransaction(res.transaction_hash);
+                    console.log('res', res.transaction_hash);
+                    const txReceipt = await provider.getTransactionReceipt(res.transaction_hash);
+                    let address;
+                    if (txReceipt.isSuccess()) {
 
 
-                        const contractDecimal = eventData.contract_address;
+                        const events = contractCall.parseEvents(txReceipt);
 
-                        console.log('contractDecimal', contractDecimal);
-                        if (contractDecimal) {
-                            const contractHex = "0x" + contractDecimal.toString(16).padStart(64, '0');
-                            console.log("✅ Contract Address (Hex):", contractHex);
-                            address = contractHex;
-                            
+
+                        //new
+                        const orbCreatedEvent = events.find((event) =>
+                            Object.keys(event).includes("orbland::orb_pond::ORB_pond::OrbCreated")
+                        );
+
+                        if (orbCreatedEvent) {
+                            const eventData = orbCreatedEvent["orbland::orb_pond::ORB_pond::OrbCreated"];
+
+
+                            const contractDecimal = eventData.contract_address;
+
+                            console.log('contractDecimal', contractDecimal);
+                            if (contractDecimal) {
+                                const contractHex = "0x" + contractDecimal.toString(16).padStart(64, '0');
+                                console.log("✅ Contract Address (Hex):", contractHex);
+                                address = contractHex;
+
+                            }
                         }
+
+                        // return orbAddres
+
                     }
-                    // return orbAddres
-                   
+
+
+                    return { transactionHash: res.transaction_hash, address };
                 }
-
-
-                return { transactionHash: res.transaction_hash, address };
 
             }
         } catch (error) {
             console.error('error', error);
             // toast.error('Error creating Orb');
-            return { transactionHash:null, address:null };
+            return { transactionHash: null, address: null };
 
         }
 
@@ -136,7 +139,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
     const createOrb = async () => {
         setIsLoading(true);
-        if (!starknetAccount?.account?.address) {
+        if (!starknetAccount?.address) {
             toast.error('Please connect your wallet');
             setIsLoading(false);
             return;
@@ -238,7 +241,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
                     const result = await uploadDataToContract(firstHalf, secondHalf);
                     console.log('result', result);
-                    
+
                     if (result?.transactionHash !== null) {
                         setOrbDetailsData({
                             name: data.name,
@@ -248,13 +251,13 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                             x_account: data.x_account,
                             farcaster: data.farcaster,
                             address: result?.address || ''
-                          })
+                        })
 
-                          toast.success('Orb Created Successfully');
-                          setIsLoading(false);
+                        toast.success('Orb Created Successfully');
+                        setIsLoading(false);
                         window.location.href = `/${result?.address}?orb=${data.name}`;
                         // setOpenCreateOrb(false);
-                        
+
                     }
                     if (result?.transactionHash === null) {
                         toast.error('Error creating Orb');
@@ -267,7 +270,8 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
         } catch (error) {
             console.error('error', error);
-            toast.error('Error creating Orb');
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            toast.error(`Error creating Orb: ${errorMessage}`);
             setIsLoading(false);
         }
 
@@ -287,7 +291,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
         <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
 
             <div className="w-[100%] h-screen bg-[#000000]">
-                <Navbar title="Orb Space"  />
+                <Navbar title="Orb Space" />
 
                 <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[100px] overflow-y-hidden  no-scrollbar h-[62vh] ">
                     <div className=" mx-auto w-[90%] pt-4 pb-4">
@@ -309,37 +313,37 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
                                 <input type="text" placeholder="Enter preferred name for your Orb" className="w-[100%]  bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setName(e.target.value)} />
                             </div>
                             <div className=" mt-4 flex flex-col gap-2 px-4">
-                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">NFT Symbol <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">NFT Symbol <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
                                 <input type="text" placeholder="E.g ETH for Ethereum" className="w-[100%]  bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setSymbol(e.target.value)} />
                             </div>
                             <div className=" mt-4 flex flex-col gap-2 px-4">
-                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Total Supply <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Total Supply <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
                                 <input type="number" placeholder="Enter number of orb to be available" className="w-[100%]  bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setTotalSupply(Number(e.target.value))} />
                                 <p className="text-[#9EA2B3] text-[14px] leading-[20px] font-normal ">Maximum of 5</p>
                             </div>
 
 
                             <div className=" mt-4 flex flex-col gap-2 px-4">
-                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">ORB Description <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
-                                <textarea 
-                                    placeholder="Enter what your Orb is about and what it can do" 
-                                    className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF] min-h-[100px] resize-y" 
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">ORB Description <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <textarea
+                                    placeholder="Enter what your Orb is about and what it can do"
+                                    className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF] min-h-[100px] resize-y"
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
 
                             </div>
                             <div className=" mt-4 flex flex-col gap-2 px-4">
-                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">X Account <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">X Account <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
                                 <input type="text" placeholder="Enter your X (fomerly twitter) handle" className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setXAccount(e.target.value)} />
 
                             </div>
                             <div className=" mt-4 flex flex-col gap-2 px-4">
-                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Farcaster Account (optional) </label>
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Farcaster Account (optional) </label>
                                 <input type="text" placeholder="Enter your Farcaster username" className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setFarcaster(e.target.value)} />
 
                             </div>
                             <div className=" mt-4 flex flex-col gap-2 px-4">
-                            <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Creator Name <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
+                                <label htmlFor="name" className="text-[#FFFFFF] text-[16px] leading-[24px] font-bold ">Creator Name <span className="text-[#E62E2E] text-[16px] leading-[24px] font-bold">*</span></label>
                                 <input type="text" placeholder="Enter your nickname" className="w-[100%] bg-[#303033] rounded focus:outline-none focus:border-sky-[#99E515] focus:ring-[#99E515] focus:ring-1 px-4 py-4 text-[#FFFFFF]" onChange={(e) => setCreatorName(e.target.value)} />
 
                             </div>

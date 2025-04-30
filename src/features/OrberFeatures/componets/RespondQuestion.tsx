@@ -32,8 +32,8 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
     try {
-      const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
-      const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+     
+      const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
       if (address !== null) {
 
         const { abi: testAbi } = await provider.getClassAt(address);
@@ -48,24 +48,29 @@ export default function RespondQuestion({ setOpenRespond, contentId }: invokePro
         const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
         // const contentHash = content;
         // const contentHash = CallData.compile([byteArray.byteArrayFromString(content)]);
-        const myWalletAccount = new WalletAccount(
-          { nodeUrl: myFrontendProviderUrl },
-          starknetAccount as any
-        );
+        // const myWalletAccount = new WalletAccount(
+        //   { nodeUrl: myFrontendProviderUrl },
+        //   starknetAccount as any
+        // );
+        if(!starknetAccount){
+          toast.error('Please connect your wallet');
+          setIsLoading(false);
+          return;
+        }
         const contractCall = new Contract(
           invokeAbi,
           orbInvocRegistryCA,
-          myWalletAccount
+          starknetAccount
         );
 
-        contractCall.connect(myWalletAccount);
+        contractCall.connect(starknetAccount);
         const myInvokeCall = contractCall.populate("respond", [
           cairo.uint256(Number(contentId)),
           content,
           address,
         ]);
 
-        const resToken = await myWalletAccount.execute(myInvokeCall);
+        const resToken = await starknetAccount.execute(myInvokeCall);
         await provider.waitForTransaction(resToken.transaction_hash);
         console.log("resToken", resToken.transaction_hash);
         const data = resToken.transaction_hash

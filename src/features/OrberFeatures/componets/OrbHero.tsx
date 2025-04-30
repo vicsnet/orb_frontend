@@ -83,7 +83,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         );
         setAddressFrac(totalAddressFrac.toString());
         if (starknetAccount) {
-          const buyerAddress = starknetAccount?.account.address;
+          const buyerAddress = starknetAccount?.address;
           const myFracBalance = await myContractCall.my_fractioned_balance(
             buyerAddress
           );
@@ -106,29 +106,29 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     try {
       if (address !== null) {
         console.log("starknetAccount", starknetAccount);
-        const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
+        const ProviderUrl = starknetAccount?.channel.nodeUrl;
         const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
 
         const { abi: testAbi } = await provider.getClassAt(address);
 
-        const myWalletAccount = new WalletAccount(
-          { nodeUrl: myFrontendProviderUrl },
-          starknetAccount as any
-        );
+        // const myWalletAccount = new WalletAccount(
+        //   { nodeUrl: myFrontendProviderUrl },
+        //   starknetAccount as any
+        // );
 
         if (address !== null && starknetAccount !== null) {
           const contractCall = new Contract(
             testAbi,
             address,
-            myWalletAccount
+            starknetAccount
           );
 
 
-          contractCall.connect(myWalletAccount);
+          contractCall.connect(starknetAccount);
 
           const myCall = contractCall.populate("start_orb", []);
 
-          const res = await myWalletAccount.execute(myCall);
+          const res = await starknetAccount.execute(myCall);
           await provider.waitForTransaction(res.transaction_hash);
           console.log(res.transaction_hash);
         }
@@ -246,7 +246,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             </p>
           </div>
           {/* for admin swear oath */}
-          <div className="flex justify-center items-center w-[90%] mx-auto gap-4 ">
+          {/* <div className="flex justify-center items-center w-[90%] mx-auto gap-4 ">
          
             {data?.oathHash === "" && (
               <button
@@ -257,7 +257,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               </button>
             )}
            
-           {/* set cooldown period */}
+          
 
             {cooldownDays === 0 && <button
               className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
@@ -266,7 +266,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               Set Cooldown Period
             </button>}
 
-            {/* set price */}
+          
             {Number(price) === 0 &&
               <button
                 className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
@@ -287,7 +287,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               </button>
             }
               
-          </div>
+          </div> */}
          
           {Number(data?.orbToken) === 0 && Number(price) !== 0 && (
             <div className="flex justify-center">

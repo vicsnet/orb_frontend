@@ -13,7 +13,13 @@ import SetPrice from "./componets/SetPrice";
 import { useOrbDetailsStore, useWalletStore } from "@/zustand/Wallet";
 import WalletConnectPopup from "@/components/WalletConnectPopup";
 import Loading from "@/components/Loading";
-
+import OverLayDashboard from "./componets/OverLayDashboard";
+import { Contract } from "starknet";
+import { RpcProvider } from "starknet";
+import { ProviderUrl } from "@/constant/contract";
+import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import { padHexAddress } from "@/constant/constant";
 
 export default function OrberFeatures() {
 
@@ -24,16 +30,73 @@ export default function OrberFeatures() {
   const [openCooldown, setOpenCooldown] = useState<boolean>(false)
   const [openPrice, setOpenPrice] = useState<boolean>(false)
   const [cooldownDays, setCooldownDays] = useState<number>(0)
-  const {starknetAccount} = useWalletStore()  
+  const { starknetAccount } = useWalletStore()
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { address } = useOrbDetailsStore()
   // console.log('cooldownDays cooldownDays', cooldownDays);
+
+
+  const fetchData = async () => {
+    try {
+      const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+
+      console.log('reloadaddress', address);
+
+
+      if (address !== null) {
+        // console.log('contract', address);
+
+        const { abi: testAbi } = await provider.getClassAt(address);
+
+        if (testAbi === undefined) {
+          toast.error("no abi.");
+          throw new Error("no abi.");
+
+        }
+
+        const myContractCall = new Contract(testAbi, address, provider);
+        const orbStatus = await myContractCall.get_orb_status();
+        if (!starknetAccount) {
+          return { orbStatus, orbKeeper: '0x', connectedAddress: null }
+        }
+console.log('starknetAccount', starknetAccount);
+        
+        const  keeper= await myContractCall.main_keeper();
+        const hexAddress = keeper.toString(16).padStart(64, '0')
+        const orbKeeper =  '0x' + hexAddress;
+    //  const orbKeeper = padHexAddress(keeper);
+    const addr = padHexAddress(starknetAccount?.address as string);
+        const connectedAddress = addr;
+
+        return { orbStatus, orbKeeper, connectedAddress }
+
+      }
+    } catch (error) {
+      toast.error('Error fetching data');
+      console.error(error);
+    }
+  };
+
+  const { isPending, isError, data, error, isFetching, refetch } = useQuery({
+    queryKey: ['fetchStatus'],
+    queryFn: async () => {
+      const data = await fetchData()
+      return data// Return empty object if data is null/undefined
+    },
+    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+    refetchOnMount: true, // Refetch when component mounts
+    refetchOnReconnect: true // Refetch when reconnecting
+  })
+
+  // console.log('data6', data);
   return (
 
     <section className="text-white overflow-y-scroll h-screen">
       <div className="relative">
         <div
           className="relative h-[860px] w-[100%] mobile:h-[800px] lgDesktop:h-[860px] smDesktop:h-[860px] smDesk:h-[860px] tabletAir:h-[860px]"
-          style={{ }}
+          style={{}}
         >
           <Image
             src="/images/Image.svg"
@@ -51,8 +114,12 @@ export default function OrberFeatures() {
             <OrbHero setOpenInvoke={setOpenInvoke} setOpenPurchase={setOpenPurchase} setOpenOath={setOpenOath} setOpenCooldown={setOpenCooldown} setOpenPrice={setOpenPrice} cooldownDays={cooldownDays} setIsLoading={setIsLoading} />
           </div>
         </div>
-      
+
       </div>
+      {
+        data?.connectedAddress === data?.orbKeeper && data?.orbStatus === false &&
+        <OverLayDashboard title={`${name}`} />
+      }
       <MainSection setCooldownDays={setCooldownDays} />
 
       {openPurchase &&
@@ -63,7 +130,7 @@ export default function OrberFeatures() {
       {openInvoke &&
         <AskQuestion setOpenInvoke={setOpenInvoke} title={name as string} />
       }
-      {openOath &&
+      {/* {openOath &&
         <SwearOath setOpenOath={setOpenOath} title={name as string} />
       }
 
@@ -73,13 +140,17 @@ export default function OrberFeatures() {
       }
       {openPrice &&
         <SetPrice setOpenPrice={setOpenPrice} />
-      }
+      } */}
       <Footer />
       {
-        !starknetAccount &&
-      <WalletConnectPopup />
+        (data?.connectedAddress != data?.orbKeeper && data?.orbStatus === false) &&
+        <WalletConnectPopup />
       }
-      { isLoading && <Loading />}
+
+      {(!starknetAccount && data?.orbStatus === true) &&
+        <WalletConnectPopup />
+      }
+      {isLoading && <Loading />}
     </section>
   );
 }

@@ -24,7 +24,7 @@ interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
 export default function ConnectButton({ bg }: { bg: string }) {
   // const dispatch = useDispatch<AppDispatch>();
   // const accountStarknet = useAppSelector((state) => state.walletReducer.starknetAccount);
-  const { setStarknetAccount, setDisconnectAccount, starknetAccount } = useWalletStore();
+  const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet } = useWalletStore();
   const [showModal, setShowModal] = useState(false);
 
 
@@ -74,16 +74,21 @@ export default function ConnectButton({ bg }: { bg: string }) {
   //     console.log("error", error);
   //   }
   // }
+
   const myFrontendProviders: ProviderInterface[] = [
     new RpcProvider({ nodeUrl: "https://starknet-mainnet.public.blastapi.io/rpc/v0_7" }),
     new RpcProvider({ nodeUrl: myFrontendProviderUrl }),
     new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/sepolia-juno/v0_7" })];
-  const connectWallet = async () => {
+ 
+    const connectWallet = async () => {
+      
     const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
 
     if (!selectedWalletSWO) {
       return;
     }
+
+    // await selectedWalletSWO.enable({ starknetVersion: 'v5' });
 
     const myWalletAccount = await WalletAccount.connect(
       myFrontendProviders[2],
@@ -91,16 +96,17 @@ export default function ConnectButton({ bg }: { bg: string }) {
     );
 
 
-
+   
 
     const writeChainId = await wallet.requestChainId(myWalletAccount.walletProvider);
 
+    await (selectedWalletSWO as any).enable?.({ starknetVersion: 'v5' });
 
     if (writeChainId !== testnetChainID) {
 
       await myWalletAccount.switchStarknetChain(constants.StarknetChainId.SN_SEPOLIA);
     }
-
+    setStarknet(selectedWalletSWO);
     // if(myWalletAccount){
     setStarknetAccount(myWalletAccount)
     // }

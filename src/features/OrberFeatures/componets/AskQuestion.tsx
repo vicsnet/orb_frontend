@@ -34,8 +34,8 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
       "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
     try {
-      const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
-      const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+      // const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
+      const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
       if (address !== null) {
 
         const { abi: testAbi } = await provider.getClassAt(address);
@@ -44,7 +44,7 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
         }
 
         const myOrbContractCall = new Contract(testAbi, address, provider);
-        const buyerAddress = starknetAccount?.account.address;
+        const buyerAddress = starknetAccount?.address;
         const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
         const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
@@ -52,24 +52,24 @@ export default function AskQuestion({ title, setOpenInvoke }: invokePros) {
         const contentHash = CallData.compile([byteArray.byteArrayFromString(content)]);
         if (starknetAccount !== null) {
 
-          const myWalletAccount = new WalletAccount(
-            { nodeUrl: myFrontendProviderUrl },
-            starknetAccount as any
-          );
+          // const myWalletAccount = new WalletAccount(
+          //   { nodeUrl: myFrontendProviderUrl },
+          //   starknetAccount as any
+          // );
           const contractCall = new Contract(
             invokeAbi,
             orbInvocRegistryCA,
-            myWalletAccount
+            starknetAccount 
           );
 
-          contractCall.connect(myWalletAccount);
+          contractCall.connect(starknetAccount);
           const myInvokeCall = contractCall.populate("invoke_with_hash", [
             content,
             address,
             cairo.uint256(Number(myOrbId)),
           ]);
 
-          const resToken = await myWalletAccount.execute(myInvokeCall);
+          const resToken = await starknetAccount.execute(myInvokeCall);
           await provider.waitForTransaction(resToken.transaction_hash);
           console.log("resToken", resToken.transaction_hash);
           toast.success('Invoke successful');

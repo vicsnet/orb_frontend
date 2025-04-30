@@ -154,7 +154,7 @@ export default function OrbInvocationContent() {
                 }
 
                 const myOrbContractCall = new Contract(testAbi, address, provider);
-                const buyerAddress = starknetAccount?.account.address;
+                const buyerAddress = starknetAccount?.address;
                 const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
                 console.log('myOrbId', myOrbId);
                 
@@ -167,24 +167,29 @@ export default function OrbInvocationContent() {
                     
                 }
 
-                const myWalletAccount = new WalletAccount(
-                    { nodeUrl: myFrontendProviderUrl },
-                    starknetAccount as any
-                );
+                if(!starknetAccount){
+                    toast.error('Please connect your wallet');
+                    setLoading(false);
+                    return;
+                }
+                    // const myWalletAccount = new WalletAccount(
+                    //     { nodeUrl: myFrontendProviderUrl },
+                    //     starknetAccount as any
+                    // );
                 const contractCall = new Contract(
                     invokeAbi,
                     orbInvocRegistryCA,
-                    myWalletAccount
+                    starknetAccount
                 );
 
-                contractCall.connect(myWalletAccount);
+                contractCall.connect(starknetAccount );
                 const myInvokeCall = contractCall.populate("rate_positive_reponse", [
                     address,
                     cairo.uint256(Number(id)),
                     cairo.uint256(Number(myOrbId)),
                 ]);
 
-                const resToken = await myWalletAccount.execute(myInvokeCall);
+                const resToken = await starknetAccount.execute(myInvokeCall);
                 await provider.waitForTransaction(resToken.transaction_hash);
                 console.log("resToken", resToken.transaction_hash);
                 const resTokenHash = resToken.transaction_hash;
@@ -226,30 +231,35 @@ export default function OrbInvocationContent() {
                 }
 
                 const myOrbContractCall = new Contract(testAbi, address, provider);
-                const buyerAddress = starknetAccount?.account.address;
+                if(!starknetAccount){
+                    toast.error('Please connect your wallet');
+                    setLoading(false);
+                    return;
+                }
+                const buyerAddress = starknetAccount?.address;
                 const myOrbId = await myOrbContractCall.get_token_owners_id(buyerAddress);
 
                 const { abi: invokeAbi } = await provider.getClassAt(orbInvocRegistryCA);
 
 
-                const myWalletAccount = new WalletAccount(
-                    { nodeUrl: myFrontendProviderUrl },
-                    starknetAccount as any
-                );
+                // const myWalletAccount = new WalletAccount(
+                //     { nodeUrl: myFrontendProviderUrl },
+                //     starknetAccount as any
+                // );
                 const contractCall = new Contract(
                     invokeAbi,
                     orbInvocRegistryCA,
-                    myWalletAccount
+                    starknetAccount
                 );
 
-                contractCall.connect(myWalletAccount);
+                contractCall.connect(starknetAccount);
                 const myInvokeCall = contractCall.populate("flag_response", [
                     address,
                     cairo.uint256(Number(id)),
                     cairo.uint256(Number(myOrbId)),
                 ]);
 
-                const resToken = await myWalletAccount.execute(myInvokeCall);
+                const resToken = await starknetAccount.execute(myInvokeCall);
                 await provider.waitForTransaction(resToken.transaction_hash);
                 console.log("resToken", resToken.transaction_hash);
                 const resTokenHash = resToken.transaction_hash;

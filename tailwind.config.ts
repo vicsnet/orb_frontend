@@ -22,7 +22,7 @@ const config: Config = {
         bSemismall: { max: "1366px" }, //
         lgDesktop: { max: "1280px" }, //large desktop
         smDesktop: { max: "1024px" }, // small desktop
-        smDesk: { max: "917px" }, // small desktop
+        smDesk: { max: "912px" }, // small desktop
         tabletAir: { max: "820px" }, // small desktop
         tablet: { max: "768px" },
         extraTab:{max:"767px"},

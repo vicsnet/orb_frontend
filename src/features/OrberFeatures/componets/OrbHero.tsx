@@ -3,7 +3,7 @@ import { ProviderUrl } from "@/constant/contract";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { cairo, Contract, RpcProvider, shortString, WalletAccount } from "starknet";
-import { currentDate, epochToTime } from "@/constant/constant";
+import { currentDate, epochToTime, padHexAddress, parseDate } from "@/constant/constant";
 import { LuDot } from "react-icons/lu";
 import { useOrbDetailsStore, useOrbprice, useWalletStore } from "@/zustand/Wallet"
 import { useQuery } from "@tanstack/react-query";
@@ -68,8 +68,16 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
 
 
         const orbStatus = await myContractCall.get_orb_status();
-        // setOrbStatus(orbStatus);
 
+        // setOrbStatus(orbStatus);
+      
+        const keeper = await myContractCall.main_keeper();
+        const hexAddress = keeper.toString(16).padStart(64, '0')
+        const orbKeeper = '0x' + hexAddress;
+
+        const addr = padHexAddress(starknetAccount?.address as string);
+        const connectedAddress = addr;
+        
         const orbEndTime = await myContractCall.get_honored_until();
         const epochTimeConversion = epochToTime(orbEndTime.toString());
         // setOrbEndDate(epochTimeConversion);
@@ -91,57 +99,57 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
 
           return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(),  orbToken: myFracBalance })
         }
-        return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(), orbToken: 0 })
+        return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(), orbToken: 0, orbKeeper: orbKeeper, connectedAddress: connectedAddress })
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const startMyOrb = async () => {
-    setIsLoading(true);
-    const myFrontendProviderUrl =
-      "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
+  // const startMyOrb = async () => {
+  //   setIsLoading(true);
+  //   const myFrontendProviderUrl =
+  //     "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
-    try {
-      if (address !== null) {
-        console.log("starknetAccount", starknetAccount);
-        const ProviderUrl = starknetAccount?.channel.nodeUrl;
-        const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+  //   try {
+  //     if (address !== null) {
+  //       console.log("starknetAccount", starknetAccount);
+  //       const ProviderUrl = starknetAccount?.channel.nodeUrl;
+  //       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
 
-        const { abi: testAbi } = await provider.getClassAt(address);
+  //       const { abi: testAbi } = await provider.getClassAt(address);
 
-        // const myWalletAccount = new WalletAccount(
-        //   { nodeUrl: myFrontendProviderUrl },
-        //   starknetAccount as any
-        // );
+  //       // const myWalletAccount = new WalletAccount(
+  //       //   { nodeUrl: myFrontendProviderUrl },
+  //       //   starknetAccount as any
+  //       // );
 
-        if (address !== null && starknetAccount !== null) {
-          const contractCall = new Contract(
-            testAbi,
-            address,
-            starknetAccount
-          );
-
-
-          contractCall.connect(starknetAccount);
-
-          const myCall = contractCall.populate("start_orb", []);
-
-          const res = await starknetAccount.execute(myCall);
-          await provider.waitForTransaction(res.transaction_hash);
-          console.log(res.transaction_hash);
-        }
-        toast.success('Orb started successfully');
-        setIsLoading(false);
-      }
+  //       if (address !== null && starknetAccount !== null) {
+  //         const contractCall = new Contract(
+  //           testAbi,
+  //           address,
+  //           starknetAccount
+  //         );
 
 
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
-    }
-  }
+  //         contractCall.connect(starknetAccount);
+
+  //         const myCall = contractCall.populate("start_orb", []);
+
+  //         const res = await starknetAccount.execute(myCall);
+  //         await provider.waitForTransaction(res.transaction_hash);
+  //         console.log(res.transaction_hash);
+  //       }
+  //       toast.success('Orb started successfully');
+  //       setIsLoading(false);
+  //     }
+
+
+  //   } catch (error) {
+  //     console.error(error);
+  //     setIsLoading(false);
+  //   }
+  // }
 
   const { isPending, isError, data, error, isFetching, refetch } = useQuery({
     queryKey: ['FetchHeroData'],
@@ -155,8 +163,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     refetchOnReconnect: true // Refetch when reconnecting
   })
 
-  // console.log('daraaa', data);
-  // console.log('daraaa3', data?.orbToken);
+console.log('data', data);
+console.log('currentDate', currentDate());
 
   useEffect(() => {
    refetch()
@@ -187,10 +195,10 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
           <h2 className="text-[20px] font-bold leading-[26px] tracking-[0.15px] capitalize text-white text-center pt-[16px]">
            
             
-                {data?.orbStatus && data?.orbEndDate > currentDate() && "ORB IS LIVE"}
+                { data && parseDate(data?.orbEndDate) >= parseDate(currentDate()) && "ORB IS LIVE"}
 
-                {data?.orbStatus && data?.orbEndDate < currentDate() && "ORB HAS ENDED"}
-                {!data?.orbStatus && "ORB NOT STARTED"}
+                {data && parseDate(data?.orbEndDate) <= parseDate(currentDate()) && "ORB HAS ENDED"}
+                {/* {!data?.orbStatus && "ORB NOT STARTED"} */}
             
             
           </h2>
@@ -218,12 +226,12 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             <p className="font-bold text-[20px] leading-[26px] tracking-[0.15px] text-center">
            
 
-              {data?.orbStatus === true && data?.orbEndDate && data?.orbEndDate > currentDate() || data?.orbEndDate && data?.orbEndDate < currentDate() && description ? (description && description.length > 201 ? description.slice(0, 201) + ' ...' : description) : description}
+              { data && parseDate(data?.orbEndDate) > parseDate(currentDate()) || data && parseDate(data?.orbEndDate) < parseDate(currentDate()) && description ? (description && description.length > 201 ? description.slice(0, 201) + ' ...' : description) : description}
 
  
               
-              {data?.orbStatus &&
-                data?.orbEndDate < currentDate() &&
+              {data&&
+               parseDate(data?.orbEndDate) < parseDate(currentDate()) &&
                 "And now his watch has ended. Orb is over, and no further activity will happen. Thank you to everyone who participated."}
             
             </p>
@@ -288,7 +296,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
             }
               
           </div> */}
-         
+        {data?.connectedAddress !== data?.orbKeeper &&
+        <>
           {Number(data?.orbToken) === 0 && Number(price) !== 0 && (
             <div className="flex justify-center">
               {data?.orbStatus && (
@@ -301,6 +310,8 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               )}
             </div>
           )}
+          </>
+          }
 
           {Number(data?.orbToken) === 1 && (
             <>

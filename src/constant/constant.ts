@@ -53,7 +53,11 @@ export function timeAgo(date: string) {
     }
   }
   
- 
+  export function parseDate(str:string) {
+    const [day, month, year] = str.split('/').map(Number);
+    return new Date(year, month - 1, day); // Note: months are 0-based in JavaScript
+  }
+  
 
   
   

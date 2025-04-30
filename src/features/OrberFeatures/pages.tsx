@@ -33,7 +33,7 @@ export default function OrberFeatures() {
   const { starknetAccount } = useWalletStore()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { address } = useOrbDetailsStore()
-  // console.log('cooldownDays cooldownDays', cooldownDays);
+
 
 
   const fetchData = async () => {
@@ -44,7 +44,6 @@ export default function OrberFeatures() {
 
 
       if (address !== null) {
-        // console.log('contract', address);
 
         const { abi: testAbi } = await provider.getClassAt(address);
 
@@ -59,13 +58,13 @@ export default function OrberFeatures() {
         if (!starknetAccount) {
           return { orbStatus, orbKeeper: '0x', connectedAddress: null }
         }
-console.log('starknetAccount', starknetAccount);
-        
-        const  keeper= await myContractCall.main_keeper();
+        console.log('starknetAccount', starknetAccount);
+
+        const keeper = await myContractCall.main_keeper();
         const hexAddress = keeper.toString(16).padStart(64, '0')
-        const orbKeeper =  '0x' + hexAddress;
-    //  const orbKeeper = padHexAddress(keeper);
-    const addr = padHexAddress(starknetAccount?.address as string);
+        const orbKeeper = '0x' + hexAddress;
+
+        const addr = padHexAddress(starknetAccount?.address as string);
         const connectedAddress = addr;
 
         return { orbStatus, orbKeeper, connectedAddress }
@@ -89,7 +88,7 @@ console.log('starknetAccount', starknetAccount);
     refetchOnReconnect: true // Refetch when reconnecting
   })
 
-  // console.log('data6', data);
+
   return (
 
     <section className="text-white overflow-y-scroll h-screen">
@@ -130,26 +129,16 @@ console.log('starknetAccount', starknetAccount);
       {openInvoke &&
         <AskQuestion setOpenInvoke={setOpenInvoke} title={name as string} />
       }
-      {/* {openOath &&
-        <SwearOath setOpenOath={setOpenOath} title={name as string} />
-      }
 
-      {
-        openCooldown &&
-        <CoolDownPeriod setOpenCooldown={setOpenCooldown} />
-      }
-      {openPrice &&
-        <SetPrice setOpenPrice={setOpenPrice} />
-      } */}
       <Footer />
       {
         (data?.connectedAddress != data?.orbKeeper && data?.orbStatus === false) &&
         <WalletConnectPopup />
       }
 
-      {(!starknetAccount && data?.orbStatus === true) &&
+      {/* {(!starknetAccount && data?.orbStatus === true) &&
         <WalletConnectPopup />
-      }
+      } */}
       {isLoading && <Loading />}
     </section>
   );

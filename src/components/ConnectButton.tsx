@@ -22,7 +22,7 @@ export default function ConnectButton({ bg }: { bg: string }) {
 
   const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet } = useWalletStore();
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [orbStatus, setOrbStatus] = useState<boolean>(false);
+  const [orbOwnerStatus, setOrbOwnerStatus] = useState<boolean>(false);
   const [orbAddress, setOrbAddress] = useState<string>('');
 
   const myFrontendProviderUrl =
@@ -80,7 +80,7 @@ export default function ConnectButton({ bg }: { bg: string }) {
       const { abi: testAbi } = await provider.getClassAt(orbPondCA);
       const myContractCall = new Contract(testAbi, orbPondCA, provider);
       const orbStatus = await myContractCall.get_user_status(starknetAccount?.address);
-      setOrbStatus(orbStatus);
+      setOrbOwnerStatus(orbStatus);
 
       if (orbStatus === true) {
         const orbAddress = await myContractCall.get_my_orb(starknetAccount?.address);
@@ -150,7 +150,7 @@ export default function ConnectButton({ bg }: { bg: string }) {
 
       <div className={`w-[200px] border-[1px] rounded absolute border-[#ffffff] mt-2 transition-all duration-300 ease-in-out transform ${showModal ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
         {
-          orbStatus === false ?
+          orbOwnerStatus === false ?
             <div className="flex items-center gap-2 px-4 pt-6 cursor-pointer">
               <SiContinente size={16} className="text-[#ffffff]" />
               <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">Orb Owned</p>

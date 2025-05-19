@@ -16,6 +16,7 @@ import { connect } from 'get-starknet';
 import { WALLET_API } from "@starknet-io/types-js";
 import Loading from '@/components/Loading';
 import { logger } from 'starknet';
+import { ProviderUrl } from '@/constant/contract';
 
 interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
     enable?: (options?: { starknetVersion?: string }) => Promise<void>;
@@ -82,6 +83,7 @@ export default function OverLayDashboard({ title }: { title: string }) {
 
             }
             const JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyYTBjNjg3MS04NGIxLTRlMDgtODg2ZC1iYmU5ODY5ZDQ4OWMiLCJlbWFpbCI6InZpbmNlLmFkZXNhbm1pMUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiZWQ2MGI4MzZiNGI3M2Q3OGU5NmYiLCJzY29wZWRLZXlTZWNyZXQiOiI2N2FjNWNmZTBhODIzYWEyYzA1ZDA5MDNhMDRiZWQ5YjM1MzllMDVkODkxZWMwNTRiYjM2OTBkMDUyMDdjN2NhIiwiZXhwIjoxNzcwMTEyODA3fQ.5zF5vDwlY_RHXz4lkckjovm1xbFxowIbqZvDf69QD0Y";
+
             const formData = new FormData();
             const jsonData = JSON.stringify(dataJson);
 
@@ -106,8 +108,8 @@ export default function OverLayDashboard({ title }: { title: string }) {
             const epochTime = date.getTime() / 1000;
             const convertedDays = days * 24 * 60 * 60 * 1000;
 
-            const providerURl =  "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
-            const provider = new RpcProvider({ nodeUrl: `${providerURl}` });
+
+            const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
             if (address !== null && starknetAccount !== null) {
 
 
@@ -130,10 +132,10 @@ export default function OverLayDashboard({ title }: { title: string }) {
                 // console.log('starknetAccount', starknetAccount);
                 // console.log('starknet', starknet);
                 if (starknet === null) {
-                toast.error('No wallet connected');
+                    toast.error('No wallet connected');
                     return;
                 }
-             
+
                 const calls = [
                     // Calling the first contract
                     {
@@ -167,7 +169,7 @@ export default function OverLayDashboard({ title }: { title: string }) {
                         contractAddress: address,
                         entrypoint: 'start_orb',
                         calldata: CallData.compile({
-                          
+
                         }),
                     }
                 ]
@@ -268,12 +270,12 @@ export default function OverLayDashboard({ title }: { title: string }) {
 
                 </div>
 
-                <div className="w-[50%] lgDesktop:w-[60%] mobile:w-[100%] mobile:border-[1px] mobile:border-[#F4F4F4] border-[0px] mobile:rounded-[24px]  h-[100%] rounded-r-[24px] overflow-y-scroll no-scrollbar overflow-hidden smDesktop:pb-10" style={{ background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.12) 100%)' }}>
+                <div className="w-[50%] lgDesktop:w-[60%] mobile:w-[100%] mobile:border-[1px] mobile:border-[#F4F4F4] border-[0px] mobile:rounded-[24px]  h-[100%] rounded-r-[24px] overflow-y-scroll no-scrollbar overflow-hidden pb-10 smDesktop:pb-10" style={{ background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.12) 100%)' }}>
 
                     {fields[step]}
                     <div className='flex justify-between w-[56%] lgDesktop:w-[76%] smDesktop:w-[73%] mx-auto font-bold text-[14px] leading-[26px] tracking-[0.46px]   items-center mobile:flex-col mobile:gap-4 mobile:w-[90%]'>
                         <button
-                            className={`px-24 smDesktop:px-[70px] smDesk:px-[58px] tablet:px-[48px] py-4 border border-[#FFFFFF] mobile:w-[100%] text-[#FFFFFF] rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${step === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#FFFFFF] hover:text-black'}`}
+                            className={`px-24 w-[70px] smDesktop:px-[70px] smDesk:px-[58px] tablet:px-[48px] py-4 border border-[#FFFFFF] mobile:w-[100%] text-[#FFFFFF] rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${step === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#FFFFFF] hover:text-black'}`}
                             disabled={step === 0}
                             onClick={() => {
                                 if (step > 0) {
@@ -284,22 +286,22 @@ export default function OverLayDashboard({ title }: { title: string }) {
                             Back
                         </button>
                         <button
-                            className='bg-[#99E515] text-black px-24 smDesktop:px-[70px] smDesk:px-[58px] tablet:px-[48px] mobile:w-[100%] py-4 rounded-lg transition-all duration-300 hover:bg-[#7abf12]'
+                            className='bg-[#99E515] text-black px-24 w-[70px] smDesktop:px-[70px] smDesk:px-[58px] tablet:px-[48px] mobile:w-[100%] py-4 rounded-lg transition-all duration-300 hover:bg-[#7abf12]'
                             onClick={() => {
                                 if (step === 0) {
-                                    if(content === '' || time === '' || days === 0 ){
+                                    if (content === '' || time === '' || days === 0) {
                                         toast.error('All fields are required');
                                         return;
                                     }
                                     setStep(step + 1);
                                 } else if (step === 1) {
-                                    if(cooldownPeriod === 0 || flaggingperiod === 0){
+                                    if (cooldownPeriod === 0 || flaggingperiod === 0) {
                                         toast.error('cooldown period and flagging period cannot be 0');
                                         return;
                                     }
                                     setStep(step + 1);
                                 } else if (step === 2) {
-                                    if(tokenPrice === 0){
+                                    if (tokenPrice === 0) {
                                         toast.error('Orb price cannot be 0');
                                         return;
                                     }
@@ -313,7 +315,7 @@ export default function OverLayDashboard({ title }: { title: string }) {
 
                 </div>
             </main>
-                {isLoading && <Loading />}
+            {isLoading && <Loading />}
         </section>
     )
 }

@@ -62,10 +62,11 @@ export default function OrberFeatures() {
 
         const keeper = await myContractCall.main_keeper();
         const hexAddress = keeper.toString(16).padStart(64, '0')
-        const orbKeeper = '0x' + hexAddress;
+        const orbKeeper = '0x0' + hexAddress;
 
         const addr = padHexAddress(starknetAccount?.address as string);
         const connectedAddress = addr;
+
 
         return { orbStatus, orbKeeper, connectedAddress }
 

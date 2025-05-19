@@ -34,7 +34,7 @@ export default function SwearOath({ title, content, setContent, time, setTime, d
                   required
                   placeholder='I, Orbspace, swear to honor my Orb as long as I am able, or until it is retired. I shall answer any permissible question dutifully to the best of my abilities – as long as answering does not bring me into conflict with the law or my ethical code, or compromise myself or others.' 
                   className='w-[100%]  bg-[#303033] rounded p-3 text-[#FFFFFF] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#99E515] focus:ring-1 focus:ring-[#99E515] transition-all duration-300 hover:shadow-lg hover:shadow-[#99E515]/20 h-[150px] lgDesktop:h-[100px] ' 
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={(e) => setContent(e.target.value.replace(/\s*\n\s*/g, ' ').trim())}
                 />
               </div>
             </div>

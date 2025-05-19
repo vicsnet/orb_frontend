@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import {connect, disconnect} from 'get-starknet'
 
 import { connect, disconnect, } from "get-starknet";
-import { RpcProvider, Provider, ProviderInterface, constants } from "starknet";
+import { RpcProvider, Provider, ProviderInterface, constants, Contract, cairo } from "starknet";
 import { WALLET_API } from "@starknet-io/types-js";
 import { WalletAccount, wallet, } from 'starknet';
 import { FaRegCopy } from "react-icons/fa6";
@@ -10,78 +10,34 @@ import { RiExternalLinkLine } from "react-icons/ri";
 import { IoIosSettings } from "react-icons/io";
 import { SiContinente } from "react-icons/si";
 import { MdAccountBalanceWallet } from "react-icons/md";
-
-
-// import { useDispatch } from "react-redux";
-// import { AppDispatch, useAppSelector } from "@/redux/store";
-// import { walletConnect, walletDisConnect } from "@/redux/features/walletSlice";
 import { useWalletStore } from "@/zustand/Wallet";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { orbPondCA, ProviderUrl } from "@/constant/contract";
+import Link from "next/link";
 
 interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
 }
 export default function ConnectButton({ bg }: { bg: string }) {
-  // const dispatch = useDispatch<AppDispatch>();
-  // const accountStarknet = useAppSelector((state) => state.walletReducer.starknetAccount);
-  const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet } = useWalletStore();
-  const [showModal, setShowModal] = useState(false);
 
+  const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet } = useWalletStore();
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [orbStatus, setOrbStatus] = useState<boolean>(false);
+  const [orbAddress, setOrbAddress] = useState<string>('');
 
   const myFrontendProviderUrl =
     "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
   const testnetChainID = "0x534e5f5345504f4c4941";
 
-  // async function connectWallet() {
-  //   try {
-  //     const starknet = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
-
-  //     const provider = new Provider({
-  //       // rpc: {
-  //       nodeUrl: myFrontendProviderUrl,
-  //       // },
-  //     });
-
-  //     if (window.starknet) {
-  //       window.starknet.provider = provider;
-  //     } else {
-  //       console.error("StarkNet wallet is not available.");
-  //       return;
-  //     }
-
-  //     if (starknet) {
-  //       //
-  //         const ChainId = starknet.chainId;
-  //        if(ChainId !== 'SN_SEPOLIA'){
-  //         console.log('ChainId', ChainId);  
-
-  //           // await myWalletAccount.switchStarknetChain(constants.StarknetChainId.SN_SEPOLIA);
-
-  //         return;
-  //       }
-  //       await starknet.enable();
-  //       // const myWalletAccount = new WalletAccount({ nodeUrl: myFrontendProviderUrl }, starknet);
-  //       // const data  = walletConnect(starknet);
-  //       const data = starknet;
-  //       // console.log('ddddata', data);
-
-  //       setStarknetAccount(data);
-  //       // dispatch(walletConnect(starknet));
-  //     }
-  //     console.log(starknet);
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   }
-  // }
 
   const myFrontendProviders: ProviderInterface[] = [
     new RpcProvider({ nodeUrl: "https://starknet-mainnet.public.blastapi.io/rpc/v0_7" }),
     new RpcProvider({ nodeUrl: myFrontendProviderUrl }),
     new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/sepolia-juno/v0_7" })];
- 
-    const connectWallet = async () => {
-      
+
+  const connectWallet = async () => {
+
     const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
 
     if (!selectedWalletSWO) {
@@ -96,7 +52,7 @@ export default function ConnectButton({ bg }: { bg: string }) {
     );
 
 
-   
+
 
     const writeChainId = await wallet.requestChainId(myWalletAccount.walletProvider);
 
@@ -116,15 +72,40 @@ export default function ConnectButton({ bg }: { bg: string }) {
     await disconnect();
     setDisconnectAccount();
 
-
-    // dispatch(walletDisConnect())
   }
 
-  // console.log('ddddata', starknetAccount);
+  const readOrb = async () => {
+    try {
+      const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+      const { abi: testAbi } = await provider.getClassAt(orbPondCA);
+      const myContractCall = new Contract(testAbi, orbPondCA, provider);
+      const orbStatus = await myContractCall.get_user_status(starknetAccount?.address);
+      setOrbStatus(orbStatus);
+
+      if (orbStatus === true) {
+        const orbAddress = await myContractCall.get_my_orb(starknetAccount?.address);
+        let contractAddress = BigInt(orbAddress);
+        let hexAddress = contractAddress.toString(16);
+        hexAddress = hexAddress.padStart(64, '0');
+        setOrbAddress('0x' + hexAddress);
+
+      }
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+
+  useEffect(() => {
+    if (starknetAccount) {
+      readOrb();
+    }
+
+  }, [starknetAccount]);
+
 
   return (
     <div className="relative">
-      
+
       {
         starknetAccount ?
           <div
@@ -168,10 +149,18 @@ export default function ConnectButton({ bg }: { bg: string }) {
       }
 
       <div className={`w-[200px] border-[1px] rounded absolute border-[#ffffff] mt-2 transition-all duration-300 ease-in-out transform ${showModal ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-        <div className="flex items-center gap-2 px-4 pt-6">
-          <SiContinente size={16} className="text-[#ffffff]" />
-          <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">View Orb</p>
-        </div>
+        {
+          orbStatus === false ?
+            <div className="flex items-center gap-2 px-4 pt-6 cursor-pointer">
+              <SiContinente size={16} className="text-[#ffffff]" />
+              <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">Orb Owned</p>
+            </div>
+            :
+            <Link href={`/${orbAddress}`} className="flex items-center gap-2 px-4 pt-6 cursor-pointer">
+              <SiContinente size={16} className="text-[#ffffff]" />
+              <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">View My Orb</p>
+            </Link>
+        }
         <div className="flex items-center gap-2 px-4 pt-4">
           <IoIosSettings size={16} className="text-[#ffffff]" />
           <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">Settings</p>
@@ -179,8 +168,8 @@ export default function ConnectButton({ bg }: { bg: string }) {
         <div className="px-4 pt-4 pb-4">
           <div className="flex items-center gap-2 pt-4 border-t-[1px] border-[#ffffff] cursor-pointer">
             <MdAccountBalanceWallet size={16} className="text-[#F84337] transition-colors duration-300 hover:text-[#ff6b6b]" />
-            <p 
-              onClick={() => { disconnectWallet(); setShowModal(false) }} 
+            <p
+              onClick={() => { disconnectWallet(); setShowModal(false) }}
               className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#F84337] transition-colors duration-300 hover:text-[#ff6b6b] cursor-pointer"
             >
               Disconnect Wallet

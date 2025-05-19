@@ -258,7 +258,7 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
                         toast.success('Orb Created Successfully');
                         setIsLoading(false);
-                       router.push(`/${result?.address}?orb=${data.name}`);
+                        router.push(`/${result?.address}?orb=${data.name}`);
                         // setOpenCreateOrb(false);
 
                     }

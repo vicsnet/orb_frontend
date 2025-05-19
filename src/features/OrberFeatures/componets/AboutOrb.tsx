@@ -55,7 +55,7 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
         refetchOnMount: true, // Refetch when component mounts
         refetchOnReconnect: true // Refetch when reconnecting
       })
-// console.log('dataCooldown',data?.cooldown);
+console.log('dataCooldown', data);
 
 
     useEffect(() => {

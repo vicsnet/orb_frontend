@@ -40,7 +40,7 @@ export default function OrberFeatures() {
     try {
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
 
-      console.log('reloadaddress', address);
+      // console.log('reloadaddress', address);
 
 
       if (address !== null) {
@@ -58,7 +58,7 @@ export default function OrberFeatures() {
         if (!starknetAccount) {
           return { orbStatus, orbKeeper: '0x', connectedAddress: null }
         }
-        console.log('starknetAccount', starknetAccount);
+        // console.log('starknetAccount', starknetAccount);
 
         const keeper = await myContractCall.main_keeper();
         const hexAddress = keeper.toString(16).padStart(64, '0')

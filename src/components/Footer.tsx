@@ -16,7 +16,7 @@ export default function Footer({ setOpenCreateOrb }: OrbFooterProps) {
   const { address } = useOrbDetailsStore()
   // const current_path = router.pathname;
 
-  console.log(pathname);
+  // console.log(pathname);
 
   return (
     <section className='relative bottom-0'>
@@ -77,7 +77,7 @@ export default function Footer({ setOpenCreateOrb }: OrbFooterProps) {
         {/* main Footer */}
         <div className="mt-[50px] pb-[20px]">
           <h1 className="text-[128px] leading-[163.84px] text-center text-[#E0FE82] tabletAir:text-[80px] mobile:text-[48px] font-['Fruktur'] font-normal" >ORB SPACE</h1>
-          <p className="text-[20px] font-bold leading-[130%] tracking-[0.15px] text-center">© 2024 Orbspace Technologies. All rights reserved.
+          <p className="text-[20px] font-bold leading-[130%] tracking-[0.15px] text-center">©{new Date().getFullYear()} Orbspace Technologies. All rights reserved.
           </p>
           <p className="text-[20px] font-bold leading-[130%] tracking-[0.15px] text-center mt-1 tabletAir:text-[16px] mobile:text-[14px]">
             Questions, feedback, or just want to chat? Email us at hello@orb.space

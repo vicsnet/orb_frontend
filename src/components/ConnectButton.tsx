@@ -120,7 +120,7 @@ export default function ConnectButton({ bg }: { bg: string }) {
     // dispatch(walletDisConnect())
   }
 
-  console.log('ddddata', starknetAccount);
+  // console.log('ddddata', starknetAccount);
 
   return (
     <div className="relative">

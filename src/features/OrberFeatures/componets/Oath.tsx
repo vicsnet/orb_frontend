@@ -94,13 +94,13 @@ export default function Oath() {
           if (response.data && typeof response.data === 'object') {
 
             const orbData = response.data as unknown as OrbData;
-            console.log('ddddd2', response.data);
+            // console.log('ddddd2', response.data);
             // setOrbHashData(orbData);
             const data = orbData.questions;
             // dispatch(getOrbTerms({ data }));
             setOrbTerms(data);
 
-            console.log('orb terms data', data);
+            // console.log('orb terms data', data);
             return ({ honoredUntil: honoredDate.toString(), orbHashData: orbData })
           }
 
@@ -128,9 +128,9 @@ export default function Oath() {
   // console.log('dataorbHashData',data?.orbHashData);
 
 
-  useEffect(() => {
-    refetch()
-  },[]);
+  // useEffect(() => {
+  //   refetch()
+  // },[]);
 
 
   return (

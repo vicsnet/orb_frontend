@@ -15,6 +15,7 @@ import {
   Account,
   WalletAccount,
   cairo,
+  CallData,
   // StarknetWalletProvider
 
 } from "starknet";
@@ -46,7 +47,7 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
 
   console.log("pricee", price);
 
-  
+
 
   const fetchData = async () => {
     try {
@@ -78,76 +79,47 @@ export default function Purchase({ setOpenPurchase }: OrbHeroProps) {
 
   const purchaseFraction = async () => {
     setIsLoading(true);
-    const myFrontendProviderUrl =
-      "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
+
     try {
       if (address !== null) {
         console.log("starknetAccount", starknetAccount);
-        // const ProviderUrl = starknetAccount?.provider.provider.nodeUrl;
-        const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
-        const buyerAddress = starknetAccount?.address;
-        // console.log();
-
-        const { abi: testAbi } = await provider.getClassAt(address);
-        const { abi: tokenAbi } = await provider.getClassAt(tokenAddress);
-
-        const selectedWalletSWO = await connect({ modalMode: 'alwaysAsk', modalTheme: 'light' });
-        // const signer = starknetAccount?.account.signer;
+        const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
+      
         if (starknetAccount !== null) {
-
-          // const myWalletAccount = new WalletAccount(
-          //   { nodeUrl: myFrontendProviderUrl },
-          //   starknetAccount as any
-          // );
-
-          // console.log(myWalletAccount, `myWalletAccount`);
-
-          if (address !== null && starknetAccount !== null) {
-            const contractCall = new Contract(
-              testAbi,
-              address,
-              starknetAccount
-            );
-            const tokencontractCall = new Contract(
-              tokenAbi,
-              tokenAddress,
-              starknetAccount
-            );
-            tokencontractCall.connect(starknetAccount);
-            const myTokenCall = tokencontractCall.populate("approve", [
-              address,
-              cairo.uint256(Number(price)),
-            ]);
-
-            const resToken = await starknetAccount.execute(myTokenCall);
-            await provider.waitForTransaction(resToken.transaction_hash);
-            console.log("resToken", resToken.transaction_hash);
-if(!buyerAddress){
-  toast.error('Please connect your wallet');
-  setIsLoading(false);
-  return;
-}
-            if (resToken) {
-              contractCall.connect(starknetAccount);
-
-              const myCall = contractCall.populate("buy_orb", [
-                buyerAddress,
-                cairo.uint256(Number(price)),
-                tokenAddress,
-                cairo.uint256(Number(1)),
-              ]);
-
-              const res = await starknetAccount.execute(myCall);
-              await provider.waitForTransaction(res.transaction_hash);
-              console.log(res.transaction_hash);
+          const calls = [
+            {
+              contractAddress: tokenAddress,
+              entrypoint: "approve",
+              calldata: CallData.compile({
+                spender: address,
+                amount: cairo.uint256(Number(price))
+            }),
+            },
+            {
+              contractAddress: address,
+              entrypoint: "buy_orb",
+              calldata: CallData.compile({
+                buyer_address: starknetAccount?.address,
+                amount_: cairo.uint256(Number(price)),
+                token_address_: tokenAddress,
+                fractioned_unit_: cairo.uint256(Number(1))
+              })
+            }
+            
+            
+          ]
+          const multiCall = await starknetAccount.execute(calls);
+          await provider.waitForTransaction(multiCall.transaction_hash);
+          console.log('tx', multiCall);
+            
               toast.success('Purchase successful');
               setIsLoading(false);
               setOpenPurchase(false);
             }
           }
         }
-      }
-    } catch (error) {
+      
+    catch (error) {
       console.error(error);
       toast.error('Purchase failed');
       setIsLoading(false);
@@ -160,32 +132,13 @@ if(!buyerAddress){
       const data = await fetchData()
       return data
     },
-    refetchInterval: 5000, // Refetch every 5 seconds
+    // refetchInterval: 10000, 
     refetchOnWindowFocus: true, // Refetch when window regains focus
     refetchOnMount: true, // Refetch when component mounts
     refetchOnReconnect: true // Refetch when reconnecting
   })
 
-  useEffect(() => {
-    refetch()
-  }, [])
 
-  console.log('FetchPurchaseData', data);
-
-  // const mutation = useMutation({
-  //   mutationFn: (Purchase) => {
-  //     const data = purchaseFraction()
-  //     return data;
-  //   },
-  // });
-
-  // if (mutation.isSuccess) {
-  //   // setOpenRespond(false)
-  //   toast.success(`tx:hash:${mutation.data}`)
-  // }
-  // if (mutation.error) {
-  //   toast.error(`${mutation.error}`)
-  // }
 
   return (
     <main className="w-[100%] h-screen absolute top-0 backdrop-blur-sm bg-black/30 z-10 overflow-y-scroll  no-scrollbar">
@@ -225,8 +178,7 @@ if(!buyerAddress){
                 Orb Price
               </p>
               <p className="font-bold text-[#FFFFFF]">
-                {" "}
-                {price ? parseFloat(price) / 1000000000000000000 : "0"} strk
+                {(price ? (parseFloat(price) / 1000000000000000000).toFixed(2) : "0")} strk
               </p>
             </div>
           </div>
@@ -270,12 +222,12 @@ if(!buyerAddress){
               onClick={() => purchaseFraction()}
             >
               Purchase
-             
+
             </div>
           </div>
         </div>
       </section>
-      {isLoading && <Loading   />}
+      {isLoading && <Loading />}
     </main>
   );
 }

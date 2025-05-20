@@ -95,6 +95,7 @@ export default function CreatorsContent() {
                 return(
                   <div key={data} className="">
                     <SingleCreator 
+                      buttonText="View Orb"
                       address={data}
                     />
                   </div>

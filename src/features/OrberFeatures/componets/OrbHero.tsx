@@ -3,12 +3,12 @@ import { ProviderUrl } from "@/constant/contract";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { cairo, Contract, RpcProvider, shortString, WalletAccount } from "starknet";
-import { currentDate, epochToTime, padHexAddress, parseDate } from "@/constant/constant";
+import { currentDate, epochToTime, padHexAddress, padmyHexAddress, parseDate } from "@/constant/constant";
 import { LuDot } from "react-icons/lu";
 import { useOrbDetailsStore, useOrbprice, useWalletStore } from "@/zustand/Wallet"
 import { useQuery } from "@tanstack/react-query";
-import Loading from "@/components/Loading";
 import { toast } from "react-toastify";
+
 
 
 type OrbHeroProps = {
@@ -19,9 +19,10 @@ type OrbHeroProps = {
   setOpenPrice: React.Dispatch<React.SetStateAction<boolean>>;
   cooldownDays: number;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  creator: string;
 };
 
-export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays, setIsLoading }: OrbHeroProps) {
+export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, setOpenCooldown, setOpenPrice, cooldownDays, setIsLoading, creator }: OrbHeroProps) {
 
   const { setOrbPrice, price } = useOrbprice();
   const { starknetAccount } = useWalletStore();
@@ -40,7 +41,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
   const fetchData = async () => {
     try {
       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-      console.log('reloadaddress', address);
+      // console.log('reloadaddress', address);
       
 
       if (address !== null) {
@@ -74,10 +75,13 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
         const keeper = await myContractCall.main_keeper();
         const hexAddress = keeper.toString(16).padStart(64, '0')
         const orbKeeper = '0x' + hexAddress;
+        // console.log('orbKeeper', orbKeeper)
 
-        const addr = padHexAddress(starknetAccount?.address as string);
+        const addr = padmyHexAddress(starknetAccount?.address as string);
         const connectedAddress = addr;
-        
+
+        console.log('connectedAddress', connectedAddress)
+
         const orbEndTime = await myContractCall.get_honored_until();
         const epochTimeConversion = epochToTime(orbEndTime.toString());
         // setOrbEndDate(epochTimeConversion);
@@ -97,9 +101,12 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
           );
           // setOrbToken(myFracBalance);
 
-          return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(),  orbToken: myFracBalance })
+          return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(), orbToken: myFracBalance, orbKeeper: orbKeeper, connectedAddress: connectedAddress })
+
+        
         }
-        return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(), orbToken: 0, orbKeeper: orbKeeper, connectedAddress: connectedAddress })
+        return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(),  orbToken: 0 })
+        // return ({ myOrbprice: priceHash.toString(), oathHash: oathHash, totalFracOrb: totalOrb.toString(), orbStatus: orbStatus, orbEndDate: epochTimeConversion, AddressFrac:totalAddressFrac.toString(), orbToken: 0, orbKeeper: orbKeeper, connectedAddress: connectedAddress })
       }
     } catch (error) {
       console.error(error);
@@ -114,11 +121,12 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
       const data = await fetchData()
       return data// Return empty object if data is null/undefined
     },
-    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchInterval: 50000, // Refetch every 5 seconds
     refetchOnWindowFocus: true, // Refetch when window regains focus
     refetchOnMount: true, // Refetch when component mounts
     refetchOnReconnect: true // Refetch when reconnecting
   })
+
 
 
   return (
@@ -203,7 +211,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               Active
             </p>
           </div>
-        
+      
         {data?.connectedAddress !== data?.orbKeeper &&
         <>
           {Number(data?.orbToken) === 0 && Number(price) !== 0 && (
@@ -227,11 +235,11 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
 
               <div className="flex gap-1 text-center justify-center mt-12 mb-8 ">
                 <h2 className="text-[14px] font-bold leading-[26px] tracking-[0.46px] underline text-[#99E515]">
-                  Follow Vincent
+                  Follow {creator}
                 </h2>
                 <Image
                   src="/images/External_link.svg"
-                  alt="follow_Vincent"
+                  alt="follow_creator"
                   width={16}
                   height={16}
                 />

@@ -23,7 +23,7 @@ import { padHexAddress } from "@/constant/constant";
 
 export default function OrberFeatures() {
 
-  const { name } = useOrbDetailsStore()
+  const { name, creator } = useOrbDetailsStore()
   const [openPurchase, setOpenPurchase] = useState<boolean>(false)
   const [openInvoke, setOpenInvoke] = useState<boolean>(false)
   const [openOath, setOpenOath] = useState<boolean>(false)
@@ -111,7 +111,7 @@ export default function OrberFeatures() {
           <Navbar title={`${name}'s Orb`} />
 
           <div className="">
-            <OrbHero setOpenInvoke={setOpenInvoke} setOpenPurchase={setOpenPurchase} setOpenOath={setOpenOath} setOpenCooldown={setOpenCooldown} setOpenPrice={setOpenPrice} cooldownDays={cooldownDays} setIsLoading={setIsLoading} />
+            <OrbHero setOpenInvoke={setOpenInvoke} setOpenPurchase={setOpenPurchase} setOpenOath={setOpenOath} setOpenCooldown={setOpenCooldown} setOpenPrice={setOpenPrice} cooldownDays={cooldownDays} setIsLoading={setIsLoading} creator={creator as string} />
           </div>
         </div>
 

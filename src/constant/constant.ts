@@ -21,6 +21,11 @@ export function padHexAddress(address:string ){
     return address
 }
 
+export function padmyHexAddress(address:string ){
+   
+  address = '0x' + address.substring(2); 
+return address
+}
 export function timeAgo(date: string) {
     const now = new Date();
     const dateGiven = new Date(date);

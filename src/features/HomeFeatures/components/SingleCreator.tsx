@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 
 interface CreatorProps {
   address: string,
+  buttonText: string,
   // image: string,
   // orber: string,
   // creator: string,
@@ -148,7 +149,7 @@ export default function SingleCreator(props: CreatorProps) {
             query: { orb: `${data?.name}` },
 
           }} >
-            View Orb
+            {props.buttonText}
           </Link>
         </button>
       </div>

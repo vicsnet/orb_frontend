@@ -70,17 +70,17 @@ export default function OwnedOrb() {
           const orbAddressesWithBalance: { address: string; balance: number }[] = [];
           
           for (const address of orbAddresses) {
+            const bigintAddress = BigInt(address);
+            let hexAddress = bigintAddress.toString(16);
+            hexAddress = hexAddress.padStart(64, '0');
+            const addressOrb = '0x' + hexAddress;
             try {
                 
-                const bigintAddress = BigInt(address);
-                let hexAddress = bigintAddress.toString(16);
-                hexAddress = hexAddress.padStart(64, '0');
-                const addressOrb = '0x' + hexAddress;
               const { abi: orbAbi } = await provider.getClassAt(addressOrb);
               const orbContract = new Contract(orbAbi, addressOrb, provider);
               
               // Get balance for the current user's address
-              const balance = await orbContract.balance_of(starknetAccount?.address);
+              const balance = await orbContract.my_fractioned_balance(starknetAccount?.address);
               
               // Convert balance to number and check if greater than 0
               const balanceNum = Number(balance);
@@ -91,7 +91,7 @@ export default function OwnedOrb() {
                 });
               }
             } catch (error) {
-              console.error(`Error checking balance for address ${address}:`, error);
+              console.error(`Error checking balance for address:`, error);
             }
           }
 
@@ -142,7 +142,7 @@ export default function OwnedOrb() {
                           
                             {data && data?.length > 0 ? (
                               data?.map((orb) => (
-                                <SingleCreator key={orb.address} address={orb.address} />
+                                <SingleCreator key={orb.address} address={orb.address} buttonText="Go to Orb" />
                               ))
                             ) : (
                               <div className="mt-[100px] smDesktop:mt-[50px] smDesk:mt-[100px]">

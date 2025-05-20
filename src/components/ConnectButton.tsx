@@ -15,10 +15,12 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { orbPondCA, ProviderUrl } from "@/constant/contract";
 import Link from "next/link";
-
+import { useRouter } from "next/router";
 interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
 }
 export default function ConnectButton({ bg }: { bg: string }) {
+  const router = useRouter();
+  const navigate = router.push;
 
   const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet,  } = useWalletStore();
   const { setOpenOwnedOrb } = useOpenOwnedOrb();
@@ -150,10 +152,15 @@ export default function ConnectButton({ bg }: { bg: string }) {
           </div>
       }
 
-      <div className={`w-[200px] border-[1px] rounded absolute border-[#ffffff] mt-2 transition-all duration-300 ease-in-out transform  ${showModal ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+      <div className={`w-[200px] border-[1px] rounded absolute border-[#ffffff] mt-2 transition-all duration-300 ease-in-out transform z-10  ${showModal ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
         {
           orbOwnerStatus === false ?
-            <div className="flex items-center gap-2 px-4 pt-6 cursor-pointer" onClick={() => setOpenOwnedOrb(true)}>  
+            <div className="flex items-center gap-2 px-4 pt-6 cursor-pointer" onClick={() => {
+              if (window.location.pathname !== '/') {
+               navigate('/');
+              }
+              setOpenOwnedOrb(true);
+            }}>  
               <SiContinente size={16} className="text-[#ffffff]" />
               <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">Orb Owned</p>
             </div>
@@ -163,10 +170,10 @@ export default function ConnectButton({ bg }: { bg: string }) {
               <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">View My Orb</p>
             </Link>
         }
-        <div className="flex items-center gap-2 px-4 pt-4">
+        {/* <div className="flex items-center gap-2 px-4 pt-4">
           <IoIosSettings size={16} className="text-[#ffffff]" />
           <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">Settings</p>
-        </div>
+        </div> */}
         <div className="px-4 pt-4 pb-4">
           <div className="flex items-center gap-2 pt-4 border-t-[1px] border-[#ffffff] cursor-pointer">
             <MdAccountBalanceWallet size={16} className="text-[#F84337] transition-colors duration-300 hover:text-[#ff6b6b]" />

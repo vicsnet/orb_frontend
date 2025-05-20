@@ -1,4 +1,5 @@
 // import { useAppSelector } from '@/redux/store'
+import { ProviderUrl } from '@/constant/contract';
 import { useOrbDetailsStore } from '@/zustand/Wallet';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image'
@@ -19,33 +20,37 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
 
 
     const getCoolDown = async () => {
-        const myFrontendProviderUrl =
-            "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
-        const provider = new RpcProvider({ nodeUrl: `${myFrontendProviderUrl}` });
+      
+        const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
 
         const lastBlock = await provider.getBlock('latest');
+        
         const keyFilter = [[num.toHex(hash.starknetKeccak('CooldownUpdate')), '0x8']];
-        const addr = address as string;
+        // const addr = address as string;
+
+        if(address){    
+
         const eventsList = await provider.getEvents({
-            address: addr,
-            //   from_block: { block_number: lastBlock.block_number - 9 },
+            address: address as string,
+            from_block: { block_number: 785443 },
             to_block: { block_number: lastBlock.block_number },
             keys: keyFilter,
             chunk_size: 10,
-        });
+          });
 
 
-        const uint256Value: Uint256 = { low: eventsList.events[0].data[0], high: eventsList.events[0].data[1] };
+        console.log('eventsList', eventsList);
+
+        const uint256Value: Uint256 = { low: eventsList?.events[0]?.data[0], high: eventsList?.events[0]?.data[1] };
+       
         const result = uint256.uint256ToBN(uint256Value);
-        // setCooldown(Number(result));
-        setCooldownDays(Number(result))
         
         return ({cooldown:Number(result)})
-
+        }
     }
 
     const { isPending, isError, data, error, refetch } = useQuery({
-        queryKey: ['FetchAllAdresses'],
+        queryKey: ['FetchCooldown'],
         queryFn: async () => {
           const data = await getCoolDown()
           return data
@@ -55,13 +60,13 @@ export default function AboutOrb({ setCooldownDays }: OrbHeroProps) {
         refetchOnMount: true, // Refetch when component mounts
         refetchOnReconnect: true // Refetch when reconnecting
       })
-console.log('dataCooldown', data);
+// console.log('dataCooldown', data);
 
 
-    useEffect(() => {
-        // getCoolDown()
-        refetch()
-    }, [])
+    // useEffect(() => {
+    //     getCoolDown()
+    //     // refetch()
+    // }, [])
     
     return (
         <section className='w-[90%] mx-auto'>
@@ -105,7 +110,7 @@ console.log('dataCooldown', data);
                         <p className="hidden mobile:block">.............................................</p>
 
                         <div className="flex items-center">
-                            <p className="text-[14px] font-bold tracking-[0.46px] underline">{Number(data?.cooldown) / 86400} Days</p>
+                             <p className="text-[14px] font-bold tracking-[0.46px] underline">{Number(data?.cooldown) / 86400} Days</p> 
 
                         </div>
                     </div>

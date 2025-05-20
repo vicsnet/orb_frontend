@@ -173,4 +173,12 @@ export const createLoading = create<{
     setLoading: (value) => set({ loading: typeof value === 'function' ? value(false) : value }),
 }))
 
+export const useOpenOwnedOrb = create<{
+  openOwnedOrb: boolean;
+  setOpenOwnedOrb: (value: boolean | ((prev: boolean) => boolean)) => void;
+}>((set) => ({
+  openOwnedOrb: false,
+  setOpenOwnedOrb: (value) => set({ openOwnedOrb: typeof value === 'function' ? value(false) : value }),
+}))
+
 

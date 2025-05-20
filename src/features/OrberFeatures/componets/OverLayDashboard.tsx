@@ -101,7 +101,7 @@ export default function OverLayDashboard({ title }: { title: string }) {
             });
             const response = await request.json();
 
-            console.log('resp...', response.IpfsHash);
+            // console.log('resp...', response.IpfsHash);
             const dataContent = response.IpfsHash;
 
             const date = new Date(time);

@@ -291,9 +291,9 @@ export default function CreateOrb({ setOpenCreateOrb }: OrbHeroProps) {
 
 
     return (
-        <main className="w-[100%] h-screen overflow-hidden absolute top-0 backdrop-opacity-5">
+        <main className="w-[100%] h-screen fixed top-0 left-0 backdrop-opacity-5  bg-[#000000]">
 
-            <div className="w-[100%] h-screen bg-[#000000]">
+            <div className="w-[100%] h-screen">
                 <Navbar title="Orb Space" />
 
                 <section className="w-[30%] lgDesktop:w-[40%] smDesktop:w-[45%] smDesk:w-[50%] tabletAir:w-[60%] mobile:w-[90%] mx-auto bg-[#252525] border-[1px] border-[#F4F4F4] rounded-2xl mt-[100px] overflow-y-hidden  no-scrollbar h-[62vh] ">

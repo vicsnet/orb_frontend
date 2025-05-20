@@ -38,7 +38,7 @@ export default function SingleCreator(props: CreatorProps) {
       // setLoading(true)
       if (props.address) {
 
-        const addr = shortString.decodeShortString(props.address);
+        // const addr = shortString.decodeShortString(props.address);
 
         const add = BigInt(props.address);
         let hexAddress = add.toString(16)

@@ -5,7 +5,7 @@ import CreatorsContent from './components/CreatorsContent'
 import KnowMore from './components/KnowMore'
 import Footer from '@/components/Footer'
 import CreateOrb from '@/components/CreateOrb'
-
+import OwnedOrb from './components/OwnedOrb'
 export default function HomeFeatures() {
   const[openCreateOrb, setOpenCreateOrb] = useState(false)
   
@@ -19,6 +19,7 @@ export default function HomeFeatures() {
         {openCreateOrb && <CreateOrb
          setOpenCreateOrb={setOpenCreateOrb}
          />}
+         <OwnedOrb/>
     </main>
   )
 }

@@ -10,7 +10,7 @@ import { RiExternalLinkLine } from "react-icons/ri";
 import { IoIosSettings } from "react-icons/io";
 import { SiContinente } from "react-icons/si";
 import { MdAccountBalanceWallet } from "react-icons/md";
-import { useWalletStore } from "@/zustand/Wallet";
+import { useWalletStore, useOpenOwnedOrb } from "@/zustand/Wallet";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { orbPondCA, ProviderUrl } from "@/constant/contract";
@@ -20,7 +20,9 @@ interface StarknetWalletProvider extends WALLET_API.StarknetWindowObject {
 }
 export default function ConnectButton({ bg }: { bg: string }) {
 
-  const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet } = useWalletStore();
+  const { setStarknetAccount, setDisconnectAccount, starknetAccount, setStarknet,  } = useWalletStore();
+  const { setOpenOwnedOrb } = useOpenOwnedOrb();
+
   const [showModal, setShowModal] = useState<boolean>(false);
   const [orbOwnerStatus, setOrbOwnerStatus] = useState<boolean>(false);
   const [orbAddress, setOrbAddress] = useState<string>('');
@@ -148,10 +150,10 @@ export default function ConnectButton({ bg }: { bg: string }) {
           </div>
       }
 
-      <div className={`w-[200px] border-[1px] rounded absolute border-[#ffffff] mt-2 transition-all duration-300 ease-in-out transform ${showModal ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+      <div className={`w-[200px] border-[1px] rounded absolute border-[#ffffff] mt-2 transition-all duration-300 ease-in-out transform  ${showModal ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
         {
           orbOwnerStatus === false ?
-            <div className="flex items-center gap-2 px-4 pt-6 cursor-pointer">
+            <div className="flex items-center gap-2 px-4 pt-6 cursor-pointer" onClick={() => setOpenOwnedOrb(true)}>  
               <SiContinente size={16} className="text-[#ffffff]" />
               <p className="text-[16px] font-normal leading-[20px] tracking-[0.17px] text-[#ffffff]">Orb Owned</p>
             </div>

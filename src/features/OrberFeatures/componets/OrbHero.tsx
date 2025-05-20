@@ -203,49 +203,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
               Active
             </p>
           </div>
-          {/* for admin swear oath */}
-          {/* <div className="flex justify-center items-center w-[90%] mx-auto gap-4 ">
-         
-            {data?.oathHash === "" && (
-              <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
-                onClick={() => setOpenOath(true)}
-              >
-                Swear Oath
-              </button>
-            )}
-           
-          
-
-            {cooldownDays === 0 && <button
-              className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
-              onClick={() => setOpenCooldown(true)}
-            >
-              Set Cooldown Period
-            </button>}
-
-          
-            {Number(price) === 0 &&
-              <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
-                onClick={() => setOpenPrice(true)}
-              >
-                Set Price
-              </button>
-            }
-           
-            
-            {
-              !data?.orbStatus &&
-              <button
-                className="text-[#121312] bg-[#99E515] text-[14px] font-bold leading-[26px] tracking-[0.46px] px-[14px] h-[42px] lgDesktop:leading-[18px]  mobile:leading-[18px] mobile:h-[50px] rounded-[6px] mt-12 mb-8"
-                onClick={() => startMyOrb()}
-              >
-                Start Orb
-              </button>
-            }
-              
-          </div> */}
+        
         {data?.connectedAddress !== data?.orbKeeper &&
         <>
           {Number(data?.orbToken) === 0 && Number(price) !== 0 && (

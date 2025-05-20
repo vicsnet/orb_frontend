@@ -106,50 +106,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     }
   };
 
-  // const startMyOrb = async () => {
-  //   setIsLoading(true);
-  //   const myFrontendProviderUrl =
-  //     "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/k1jbpQgERmFt0PxjkrrbWz56AVfHEQcO";
 
-  //   try {
-  //     if (address !== null) {
-  //       console.log("starknetAccount", starknetAccount);
-  //       const ProviderUrl = starknetAccount?.channel.nodeUrl;
-  //       const provider = new RpcProvider({ nodeUrl: `${ProviderUrl}` });
-
-  //       const { abi: testAbi } = await provider.getClassAt(address);
-
-  //       // const myWalletAccount = new WalletAccount(
-  //       //   { nodeUrl: myFrontendProviderUrl },
-  //       //   starknetAccount as any
-  //       // );
-
-  //       if (address !== null && starknetAccount !== null) {
-  //         const contractCall = new Contract(
-  //           testAbi,
-  //           address,
-  //           starknetAccount
-  //         );
-
-
-  //         contractCall.connect(starknetAccount);
-
-  //         const myCall = contractCall.populate("start_orb", []);
-
-  //         const res = await starknetAccount.execute(myCall);
-  //         await provider.waitForTransaction(res.transaction_hash);
-  //         console.log(res.transaction_hash);
-  //       }
-  //       toast.success('Orb started successfully');
-  //       setIsLoading(false);
-  //     }
-
-
-  //   } catch (error) {
-  //     console.error(error);
-  //     setIsLoading(false);
-  //   }
-  // }
 
   const { isPending, isError, data, error, isFetching, refetch } = useQuery({
     queryKey: ['FetchHeroData'],
@@ -163,14 +120,7 @@ export default function OrbHero({ setOpenPurchase, setOpenInvoke, setOpenOath, s
     refetchOnReconnect: true // Refetch when reconnecting
   })
 
-// console.log('data', data);
-// console.log('currentDate', currentDate());
 
-//   useEffect(() => {
-//    refetch()
-//     // console.log('orbToken', orbToken);
-
-//   }, []);
   return (
     <section className="w-[96%] mx-auto mt-[100px] mobile:mt-[50px] relative">
       <div
